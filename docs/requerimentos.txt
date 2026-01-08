@@ -1,0 +1,31 @@
+Acesso à ficha dos clientes;
+Acesso à ficha dos serviços prestados;
+Compra de material;
+Relação das fichas de serviços com os clientes que solicitaram o serviço.
+	
+	- Serviço pode estar agendado ou já ter sido concluído
+	- Opção de ver saber se o pagamento está pendente ou já foi realizado (qual o valor e a forma de pagamento)
+
+Ficha do serviço deve ter:
+	- Nome do cliente (ou condomínio)
+	- Endereço do serviço
+	- Serviço prestado
+	- Data e hora da realização do serviço
+	- Valor e informações do pagamento
+
+Ficha do cliente deve ter:
+	- Nome do cliente
+	- CPF/CNPJ
+	- Endereço(s) do cliente
+	- Todos os serviços prestados
+	- Pagamentos pendentes
+	- Serviços pendentes
+	- Número de telefone
+
+Ficha dos materiais (Só Portões):
+	- ID da compra;
+	- Data da compra;
+	- Material comprado;
+	- Quantidade de material;
+	- Custo do material;
+	- Distribuidora?
