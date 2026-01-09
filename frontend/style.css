@@ -182,6 +182,12 @@
             color: #721c24;
         }
 
+        .form-radio {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1.2rem;
+        }
+
         .form-group {
             margin-bottom: 1.2rem;
         }

@@ -25,7 +25,7 @@ window.onclick = function(event) {
 
 const radioMorador = document.getElementById('tipo-morador');
 const radioCondominio = document.getElementById('tipo-condominio');
-const condInfo = document.getElementById('condform');
+const condInfo = document.querySelector('#condform');
 
 function verificarTipoCliente() {
     if (radioCondominio.checked) {
@@ -37,6 +37,8 @@ function verificarTipoCliente() {
 
 radioMorador.addEventListener('change', verificarTipoCliente);
 radioCondominio.addEventListener('change', verificarTipoCliente);
+
+verificarTipoCliente();
 
 document.querySelectorAll('form').forEach(form => {
     form.addEventListener('submit', function(e) {

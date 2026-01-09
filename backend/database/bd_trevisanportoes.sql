@@ -12,7 +12,7 @@ CREATE TABLE tb_cliente (
 	telefone 			VARCHAR(11) NOT NULL,
 	nome			 		VARCHAR(40)	NOT NULL,
 	email					VARCHAR(100),
-	cnpj					VARCHAR(14)	UNIQUE,
+	cnpj					VARCHAR(255)	UNIQUE,
 	
 	INDEX idx_nome (nome),
 	INDEX idx_cnpj (cnpj),

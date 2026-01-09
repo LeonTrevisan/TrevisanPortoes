@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trevisan Portões Automáticos</title>
     <link rel="stylesheet" href="style.css">
-    <script src="script.js"></script>
+    <script src="script.js" defer></script>
 </head>
 <body>
     <div class="header">
@@ -229,12 +229,17 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Novo Cliente</h3>
-
-                <input type="radio" name="tipo-cliente" id="tipo-morador" value="residencial" checked>Morador</input>
-                <input type="radio" name="tipo-cliente" id="tipo-condominio" value="condominio">Condomínio</input>
-            
             </div>
-            <form action="../backend/php/cadastro_cliente.php" method="post">
+
+            
+            <form action="../backend/php/cadastro_cliente.php" method="post" enctype="multipart/form-data">
+                <div class="form-radio">
+                    <input type="radio" name="tipo-cliente" id="tipo-morador" value="residencial" checked>Morador</input>
+                </div>
+                <div class="form-radio">
+                    <input type="radio" name="tipo-cliente" id="tipo-condominio" value="condominio">Condomínio</input>
+                </div>
+
                 <div class="form-group">
                     <label>Nome Completo</label>
                     <input type="text" name="nome-cliente" required>
@@ -249,7 +254,7 @@
                     <div class="form-group">
                         <label>CNPJ</label>
                         <input type="text" name="cnpj-cliente">
-                        <input type="button" name="cnpj-doc">
+                        <input type="file" accept=".png, .jpg, .jpeg, .png" name="cnpj-doc">
                     </div>
                     <div class="form-group">
                         <label>Email</label>
@@ -257,11 +262,15 @@
                     </div>
                     <div class="form-group">
                         <label>Adminsitrador</label>
-                        <input type="text" name="adm-cliente">
+                        <select name="adm-cliente">
+                            <?php include '../backend/php/lista_administrador.php'; ?>    
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Síndico</label>
-                        <input type="text" name="sindico-cliente">
+                        <select name="sindico-cliente">
+                            <?php include '../backend/php/lista_sindico.php'; ?> 
+                        </select>
                     </div>
                 </div>
                
@@ -286,15 +295,10 @@
                 <input type="text" name="cidade-cliente" required>
                 </div>
 
-                <div class="form-group">
-                <label>Complemento</label>
-                <input type="text" name="comp-cliente" required>
-                </div>
-
             </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-danger" onclick="closeModal('modalCliente')">Cancelar</button>
-                    <button type="submit" value="cadastrar" class="btn btn-success">Salvar</button>
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="button" class="btn btn-danger">Cancelar</button>
                    
                 </div>
             </form>

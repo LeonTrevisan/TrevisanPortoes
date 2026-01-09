@@ -2,17 +2,23 @@
 include 'conexao.php';
 
 $nome = filter_input(INPUT_POST, 'nome-cliente');
-$doc = strval(filter_input(INPUT_POST, 'doc-cliente'));
 $fone = filter_input(INPUT_POST, 'tel-cliente');
+$tipocliente = filter_input(INPUT_POST, 'tipo-cliente');
+
+//exclusivo condomínio
+$email = filter_input(INPUT_POST, 'email-cliente');
+$cnpjcliente = filter_input(INPUT_POST, 'cnpj-cliente');
+$admcliente = filter_input(INPUT_POST, 'adm-cliente');
+$sindico = filter_input(INPUT_POST, 'sindico-cliente');
+
 $rua = filter_input(INPUT_POST, 'rua-cliente');
 $bairro = filter_input(INPUT_POST, 'bairro-cliente');
 $numCasa = filter_input(INPUT_POST, 'num-cliente');
 $cidade = filter_input(INPUT_POST, 'cidade-cliente');
 $comp = filter_input(INPUT_POST, 'comp-cliente');
 
-
 //preparação dos dados para cadastro do cliente
-if (empty($nome) || empty($doc)) {
+if (empty($nome) || empty($tipocliente)) {
     exit('Dados inválidos');
 }
 
@@ -61,28 +67,46 @@ if (empty($nome) || empty($doc)) {
 // }
 // }
 
+if (isset($_FILES['cnpj-doc']) && $_FILES['cnpj-doc']['error'] === 0) {
+
+    $arquivo = $_FILES['cnpj-doc'];
+
+    $pasta = "../docs/uploads/CNPJ/";
+    if (!is_dir($pasta)) {
+        mkdir($pasta, 0777, true);
+    }
+
+    $extensao = pathinfo($arquivo['name'], PATHINFO_EXTENSION);
+    $nomeArquivo = uniqid("cnpj_") . "." . $extensao;
+
+    $destino = $pasta . $nomeArquivo;
+
+    if (!move_uploaded_file($arquivo['tmp_name'], $destino)) {
+        exit('Erro ao salvar o documento');
+    }
+}
+
 $stmt = $conn->prepare("INSERT INTO tb_cliente (nome, email, telefone, cnpj)
         VALUES (?, ?, ?, ?)");
 
-$stmt -> bind_param("sss", $nome, $fone, $doc);
+$stmt -> bind_param("ssss", $nome, $email, $fone, $destino);
 
 $stmt->execute();
 
 $idCliente = $conn->insert_id;
 
 $stmtEndereco = $conn->prepare(
-    "INSERT INTO tb_endereco ( id_cliente, rua, bairro, numero, cidade, complemento)
-        VALUES (?, ?, ?, ?, ?, ?)"
+    "INSERT INTO tb_endereco ( id_cliente, rua, bairro, numero, cidade)
+        VALUES (?, ?, ?, ?, ?)"
 );
 
 $stmtEndereco->bind_param(
-    "isssss",
+    "issss",
     $idCliente,
     $rua,
     $bairro,
     $numCasa,
-    $cidade,
-    $comp
+    $cidade
 );
 
 $stmtEndereco->execute();
