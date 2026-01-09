@@ -5,12 +5,58 @@ COLLATE UTF8MB4_UNICODE_CI;
 USE bd_trevisanportoes;
 
 CREATE TABLE tb_cliente (
-	id_cliente			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY ,
+	id_cliente			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_admin				SMALLINT,
+	id_sindico			SMALLINT,
+	id_tipo_cliente	TINYINT		NOT NULL,
 	telefone 			VARCHAR(11) NOT NULL,
 	nome			 		VARCHAR(40)	NOT NULL,
-	cpf_cnpj				VARCHAR(14)	NOT NULL UNIQUE,
+	cnpj					VARCHAR(14)	NOT NULL UNIQUE,
 	
-	INDEX idx_nome (nome)
+	INDEX idx_nome (nome),
+	INDEX idx_cnpj (cnpj),
+	FOREIGN KEY (id_admin) REFERENCES tb_admin_cond (id_admin) ON DELETE RESTRICT ON UPDATE CASCADE,
+	FOREIGN KEY (id_sindico) REFERENCES tb_sindico (id_sindico) ON DELETE RESTRICT ON UPDATE CASCADE,
+	FOREIGN KEY (id_tipo_cliente) REFERENCES tb_tipo_cliente (id_tipo_cliente) ON DELETE RESTRICT ON UPDATE CASCADE
+	)
+	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	
+	
+CREATE TABLE tb_tipo_cliente (
+	id_tipo_cliente	TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	tipo_cliente		VARCHAR(20),
+	
+	INDEX idx_tipo (tipo_cliente)
+	)
+	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	
+	SHOW ENGINE INNODB STATUS;
+	LATEST FOREIGN KEY ERROR
+	
+CREATE TABLE tb_admin_cond (
+	id_admin				SMALLINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nome					VARCHAR(40)	NOT NULL,
+	telefone				VARCHAR(11)	NOT NULL,
+	email					VARCHAR(50)	NOT NULL,
+	
+	INDEX idx_nome(nome)
+	)
+	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;	
+	
+CREATE TABLE tb_sindico (
+	id_sindico			SMALLINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nome					VARCHAR(40)	NOT NULL,
+	telefone				VARCHAR(11)	NOT NULL,
+	
+	INDEX idx_nome(nome)
+	)
+	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;		
+	
+CREATE TABLE tb_tipo_cliente (
+	id_tipo				TINYINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	tipo_cliente		VARCHAR(20)	NOT NULL,
+	
+	INDEX idx_tipo_cliente (tipo_cliente)
 	)
 	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 	
