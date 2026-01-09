@@ -108,7 +108,7 @@
             </div>
 
             <!-- Ficha do cliente -->
-             <div id="ficha" class="page">
+             <section id="ficha" class="page">
                 <?php include '../backend/php/ficha_cliente.php'; ?>
              </div>
 
@@ -285,7 +285,7 @@
             <div class="modal-header">
                 <h3>Novo Serviço</h3>
             </div>
-            <form>
+            <form action="cadastro_servico.php" method="post">
                 <div class="form-group">
                     <label>Cliente</label>
                     <select required>
@@ -296,11 +296,11 @@
                 </div>
                 <div class="form-group">
                     <label>Data do Serviço</label>
-                    <input type="date" required>
+                    <input type="date" name="data_hora" required>
                 </div>
                 <div class="form-group">
                     <label>Tipo de Serviço</label>
-                    <input type="text" required>
+                    <input type="text" name="tipo" required>
                 </div>
                 <div class="form-group">
                     <label>Descrição</label>

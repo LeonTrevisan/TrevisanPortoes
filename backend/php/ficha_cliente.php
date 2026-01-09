@@ -11,9 +11,9 @@ $stmt->bind_param("i", $id);
 $stmt->execute();
 
 $result = $stmt->get_result();
-$ficha = $result->fetch_all(MYSQLI_ASSOC);
+$ficha = $result->fetch_assoc();
 
-var_dump($ficha);
+echo"Nome do cliente: " . $ficha['nome'];
 
 
 ?>

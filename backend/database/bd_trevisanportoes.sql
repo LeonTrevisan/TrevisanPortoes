@@ -39,14 +39,13 @@ CREATE TABLE tb_status_servico (
 
 CREATE TABLE tb_servico (
 	id_servico			INT 			NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	id_endereco			SMALLINT		NOT NULL,
+	id_cliente			SMALLINT		NOT NULL,
 	id_tipo				TINYINT		NOT NULL,
 	id_status			TINYINT		NOT NULL,
 	descricao			VARCHAR(100),
 	data_hora			DATETIME		NOT NULL,
 	
-	
-	FOREIGN KEY (id_endereco) REFERENCES tb_endereco(id_endereco) ON DELETE RESTRICT ON UPDATE CASCADE,
+	FOREIGN KEY (id_cliente) REFERENCES tb_cliente(id_cliente) ON DELETE RESTRICT ON UPDATE CASCADE,
 	FOREIGN KEY (id_tipo) REFERENCES tb_tipo_servico(id_tipo) ON DELETE RESTRICT ON UPDATE CASCADE,
 	FOREIGN KEY (id_status) REFERENCES tb_status_servico(id_status) ON DELETE RESTRICT ON UPDATE CASCADE,
 	
@@ -104,6 +103,3 @@ CREATE TABLE tb_distribuidora(
 	
 INSERT INTO tb_distribuidora (id_distribuidora, nome_distribuidora)
 VALUES ('','Só Portões');
-
-
-	
