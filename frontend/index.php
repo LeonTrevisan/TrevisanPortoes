@@ -109,8 +109,8 @@
 
             <!-- Ficha do cliente -->
              <section id="ficha" class="page">
-                <?php include '../backend/php/ficha_cliente.php'; ?>
-             </div>
+                <?php //include '../backend/php/ficha_cliente.php'; ?>
+            </section>
 
             <!-- Serviços -->
             <div id="servicos" class="page">
@@ -229,20 +229,42 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Novo Cliente</h3>
+
+                <input type="radio" name="tipo-cliente" id="tipo-morador" value="residencial" checked>Morador</input>
+                <input type="radio" name="tipo-cliente" id="tipo-condominio" value="condominio">Condomínio</input>
+            
             </div>
             <form action="../backend/php/cadastro_cliente.php" method="post">
                 <div class="form-group">
                     <label>Nome Completo</label>
                     <input type="text" name="nome-cliente" required>
                 </div>
-                <div class="form-group">
-                    <label>CPF/CNPJ</label>
-                    <input type="text" name="doc-cliente" required>
-                </div>
-                <div class="form-group">
+
+                 <div class="form-group">
                     <label>Telefone</label>
                     <input type="tel" name="tel-cliente" required>
                 </div>
+
+                <div id="condform" class="cond-info">
+                    <div class="form-group">
+                        <label>CNPJ</label>
+                        <input type="text" name="cnpj-cliente">
+                        <input type="button" name="cnpj-doc">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" name="email-cliente">
+                    </div>
+                    <div class="form-group">
+                        <label>Adminsitrador</label>
+                        <input type="text" name="adm-cliente">
+                    </div>
+                    <div class="form-group">
+                        <label>Síndico</label>
+                        <input type="text" name="sindico-cliente">
+                    </div>
+                </div>
+               
                 <div class="form-adress">
                 <div class="form-group">
                 <label>Rua</label>

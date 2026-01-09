@@ -11,7 +11,8 @@ CREATE TABLE tb_cliente (
 	id_tipo_cliente	TINYINT		NOT NULL,
 	telefone 			VARCHAR(11) NOT NULL,
 	nome			 		VARCHAR(40)	NOT NULL,
-	cnpj					VARCHAR(14)	NOT NULL UNIQUE,
+	email					VARCHAR(100),
+	cnpj					VARCHAR(14)	UNIQUE,
 	
 	INDEX idx_nome (nome),
 	INDEX idx_cnpj (cnpj),
@@ -20,7 +21,6 @@ CREATE TABLE tb_cliente (
 	FOREIGN KEY (id_tipo_cliente) REFERENCES tb_tipo_cliente (id_tipo_cliente) ON DELETE RESTRICT ON UPDATE CASCADE
 	)
 	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-	
 	
 CREATE TABLE tb_tipo_cliente (
 	id_tipo_cliente	TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,

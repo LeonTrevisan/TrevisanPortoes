@@ -17,15 +17,26 @@ function closeModal(modalId) {
     document.getElementById(modalId).classList.remove('active');
 }
 
-function viewClientDetails() {
-    alert('Funcionalidade de visualização de ficha do cliente será implementada');
-}
-
 window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
         event.target.classList.remove('active');
     }
 }
+
+const radioMorador = document.getElementById('tipo-morador');
+const radioCondominio = document.getElementById('tipo-condominio');
+const condInfo = document.getElementById('condform');
+
+function verificarTipoCliente() {
+    if (radioCondominio.checked) {
+        condInfo.classList.add('active');
+    } else {
+        condInfo.classList.remove('active');
+    }
+}
+
+radioMorador.addEventListener('change', verificarTipoCliente);
+radioCondominio.addEventListener('change', verificarTipoCliente);
 
 document.querySelectorAll('form').forEach(form => {
     form.addEventListener('submit', function(e) {

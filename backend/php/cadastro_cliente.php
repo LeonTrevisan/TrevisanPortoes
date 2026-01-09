@@ -21,36 +21,6 @@ if (empty($nome) || empty($doc)) {
 //     return false;
 // }
 
-// elseif(strlen($doc) == 11){
-//     function validaCPF($doc) {
-//         // Remove caracteres não numéricos
-//         $cpf = preg_replace('/\D/', '', $cpf);
-
-//         // Verifica se tem 11 dígitos
-//         if (strlen($cpf) != 11) {
-//             return false;
-//         }
-
-//         // Elimina CPFs inválidos conhecidos
-//         if (preg_match('/^(\d)\1{10}$/', $cpf)) {
-//             return false;
-//         }
-
-//         // Valida dígitos verificadores
-//         for ($t = 9; $t < 11; $t++) {
-//             $soma = 0;
-//             for ($i = 0; $i < $t; $i++) {
-//                 $soma += $cpf[$i] * (($t + 1) - $i);
-//             }
-//             $digito = ((10 * $soma) % 11) % 10;
-//             if ($cpf[$t] != $digito) {
-//                 return false;
-//             }
-//         }
-//         return true;
-//     }
-// }
-
 // elseif(strlen($doc) == 14){
 //     function validaCNPJ($cnpj) {
 //     // Remove caracteres não numéricos
@@ -91,8 +61,8 @@ if (empty($nome) || empty($doc)) {
 // }
 // }
 
-$stmt = $conn->prepare("INSERT INTO tb_cliente (nome, telefone, cpf_cnpj)
-        VALUES (?, ?, ?)");
+$stmt = $conn->prepare("INSERT INTO tb_cliente (nome, email, telefone, cnpj)
+        VALUES (?, ?, ?, ?)");
 
 $stmt -> bind_param("sss", $nome, $fone, $doc);
 
