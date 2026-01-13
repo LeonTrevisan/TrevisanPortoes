@@ -1,97 +1,97 @@
 <?php
 include 'conexao.php';
 
+//dados cliente
 $nome = filter_input(INPUT_POST, 'nome-cliente');
 $fone = filter_input(INPUT_POST, 'tel-cliente');
-$tipocliente = filter_input(INPUT_POST, 'tipo-cliente');
+// accept tipo as either numeric id or string
+$tipoRaw = filter_input(INPUT_POST, 'tipo-cliente');
+$idTipo = filter_var($tipoRaw, FILTER_VALIDATE_INT);
+if ($idTipo === false || $idTipo === null) {
+    $tipoPost = filter_input(INPUT_POST, 'tipo-cliente', FILTER_SANITIZE_STRING);
+    if ($tipoPost) {
+        $stmtTipo = $conn->prepare("SELECT id_tipo_cliente FROM tb_tipo_cliente WHERE tipo_cliente LIKE ? LIMIT 1");
+        $like = "%$tipoPost%";
+        $stmtTipo->bind_param("s", $like);
+        $stmtTipo->execute();
+        $res = $stmtTipo->get_result();
+        $row = $res ? $res->fetch_assoc() : null;
+        $idTipo = $row['id_tipo_cliente'] ?? null;
+    } else {
+        $idTipo = null;
+    }
+}
 
 //exclusivo condomínio
 $email = filter_input(INPUT_POST, 'email-cliente');
-$cnpjcliente = filter_input(INPUT_POST, 'cnpj-cliente');
-$admcliente = filter_input(INPUT_POST, 'adm-cliente');
-$sindico = filter_input(INPUT_POST, 'sindico-cliente');
+$idSindico = filter_input(INPUT_POST, 'sindico-cliente', FILTER_VALIDATE_INT);
+$idAdm = filter_input(INPUT_POST, 'adm-cliente', FILTER_VALIDATE_INT);
+// possible CNPJ text field
+$cnpj_text = filter_input(INPUT_POST, 'cnpj-cliente', FILTER_SANITIZE_STRING);
 
+//endereço
 $rua = filter_input(INPUT_POST, 'rua-cliente');
 $bairro = filter_input(INPUT_POST, 'bairro-cliente');
 $numCasa = filter_input(INPUT_POST, 'num-cliente');
 $cidade = filter_input(INPUT_POST, 'cidade-cliente');
 $comp = filter_input(INPUT_POST, 'comp-cliente');
 
-//preparação dos dados para cadastro do cliente
-if (empty($nome) || empty($tipocliente)) {
+if (empty($fone) || empty($nome) || empty($idTipo) || empty($rua) || empty($bairro) || empty($numCasa) || empty($cidade)) {
     exit('Dados inválidos');
 }
 
-// //verificação dos documentos
-// if (strlen($doc) != 11 || strlen($doc) != 14){
-//     return false;
-// }
-
-// elseif(strlen($doc) == 14){
-//     function validaCNPJ($cnpj) {
-//     // Remove caracteres não numéricos
-//     $cnpj = preg_replace('/\D/', '', $cnpj);
-//     // Verifica se tem 14 dígitos
-//     if (strlen($cnpj) != 14) {
-//         return false;
-//     }
-//     // Elimina CNPJs inválidos conhecidos
-//     if (preg_match('/^(\d)\1{13}$/', $cnpj)) {
-//         return false;
-//     }
-//     // Validação do primeiro dígito
-//     $pesos1 = [5,4,3,2,9,8,7,6,5,4,3,2];
-//     $soma = 0;
-//     for ($i = 0; $i < 12; $i++) {
-//         $soma += $cnpj[$i] * $pesos1[$i];
-//     }
-//     $resto = $soma % 11;
-//     $digito1 = ($resto < 2) ? 0 : 11 - $resto;
-
-//     if ($cnpj[12] != $digito1) {
-//         return false;
-//     }
-//     // Validação do segundo dígito
-//     $pesos2 = [6,5,4,3,2,9,8,7,6,5,4,3,2];
-//     $soma = 0;
-//     for ($i = 0; $i < 13; $i++) {
-//         $soma += $cnpj[$i] * $pesos2[$i];
-//     }
-//     $resto = $soma % 11;
-//     $digito2 = ($resto < 2) ? 0 : 11 - $resto;
-
-//     if ($cnpj[13] != $digito2) {
-//         return false;
-//     }
-//     return true;
-// }
-// }
-
+// determine CNPJ value: prefer uploaded file path, otherwise use text field
+$cnpj = null;
 if (isset($_FILES['cnpj-doc']) && $_FILES['cnpj-doc']['error'] === 0) {
-
     $arquivo = $_FILES['cnpj-doc'];
-
     $pasta = "../docs/uploads/CNPJ/";
     if (!is_dir($pasta)) {
         mkdir($pasta, 0777, true);
     }
-
     $extensao = pathinfo($arquivo['name'], PATHINFO_EXTENSION);
     $nomeArquivo = uniqid("cnpj_") . "." . $extensao;
-
     $destino = $pasta . $nomeArquivo;
-
     if (!move_uploaded_file($arquivo['tmp_name'], $destino)) {
         exit('Erro ao salvar o documento');
     }
+    $cnpj = $destino;
+} elseif (!empty($cnpj_text)) {
+    $cnpj = $cnpj_text;
 }
 
-$stmt = $conn->prepare("INSERT INTO tb_cliente (nome, email, telefone, cnpj)
-        VALUES (?, ?, ?, ?)");
+// determine if tipo is a condomínio (by name)
+$isCondominio = false;
+if ($idTipo !== null) {
+    $stmtTipoName = $conn->prepare("SELECT tipo_cliente FROM tb_tipo_cliente WHERE id_tipo_cliente = ? LIMIT 1");
+    $stmtTipoName->bind_param("i", $idTipo);
+    $stmtTipoName->execute();
+    $resTipo = $stmtTipoName->get_result()->fetch_assoc();
+    $tipoName = $resTipo['tipo_cliente'] ?? '';
+    if (stripos($tipoName, 'cond') !== false) $isCondominio = true;
+}
 
-$stmt -> bind_param("ssss", $nome, $email, $fone, $destino);
+if($isCondominio){
+    $email = $email ?: null;
+    // keep $idAdm and $idSindico as provided (IDs or null)
+} else {
+    $email = null;
+    $idSindico = null;
+    $idAdm = null;
+}
 
-$stmt->execute();
+// cast to scalars
+$idTipo = $idTipo !== null ? (int)$idTipo : null;
+$idAdm = $idAdm !== null ? (int)$idAdm : null;
+$idSindico = $idSindico !== null ? (int)$idSindico : null;
+
+$stmt = $conn->prepare("INSERT INTO tb_cliente (nome, email, telefone, cnpj, id_tipo_cliente, id_admin, id_sindico)
+        VALUES (?, ?, ?, ?, ?, ?, ?)");
+
+$stmt -> bind_param("ssssiii", $nome, $email, $fone, $cnpj, $idTipo, $idAdm, $idSindico);
+
+if (!$stmt->execute()) {
+    exit('Erro ao inserir cliente: ' . $stmt->error);
+} 
 
 $idCliente = $conn->insert_id;
 

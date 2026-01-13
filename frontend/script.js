@@ -39,15 +39,3 @@ radioMorador.addEventListener('change', verificarTipoCliente);
 radioCondominio.addEventListener('change', verificarTipoCliente);
 
 verificarTipoCliente();
-
-document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Dados salvos com sucesso!');
-        const modal = this.closest('.modal');
-        if (modal) {
-            modal.classList.remove('active');
-        }
-        this.reset();
-    });
-});

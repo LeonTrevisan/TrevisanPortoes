@@ -1,0 +1,36 @@
+Cliente (residência/condomínio)
+	Nome
+	Endereço
+	Telefone
+	Tipo cliente
+	//condomínios
+	Email
+	CNPJ
+	Responsável(administrador)
+	Id Síndico
+
+Síndico
+	Nome
+	Telefone
+
+Responsável (administrador)
+	Nome
+	Telefone
+	Email
+	
+	
+Serviço
+	Tipo do serviço (instalação, manutenção corretiva, manutenção preventiva)
+	Descrição
+	Observação/orientação
+	Foto
+	Data
+	Comprovante
+
+Pagamento
+	Forma de pagamento
+	Valor
+	Nota
+	Status
+
+Lojas: Reman, só portões, BJ

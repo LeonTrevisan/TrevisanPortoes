@@ -96,7 +96,8 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Telefone</th>
-                                <th>CPF/CNPJ</th>
+                                <th>CNPJ</th>
+                                <th>Tipo</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -234,10 +235,10 @@
             
             <form action="../backend/php/cadastro_cliente.php" method="post" enctype="multipart/form-data">
                 <div class="form-radio">
-                    <input type="radio" name="tipo-cliente" id="tipo-morador" value="residencial" checked>Morador</input>
+                    <input type="radio" name="tipo-cliente" id="tipo-morador" value="Residencial" checked>Residencial</input>
                 </div>
                 <div class="form-radio">
-                    <input type="radio" name="tipo-cliente" id="tipo-condominio" value="condominio">Condomínio</input>
+                    <input type="radio" name="tipo-cliente" id="tipo-condominio" value="Condomínio">Condomínio</input>
                 </div>
 
                 <div class="form-group">

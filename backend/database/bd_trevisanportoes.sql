@@ -5,11 +5,11 @@ COLLATE UTF8MB4_UNICODE_CI;
 USE bd_trevisanportoes;
 
 CREATE TABLE tb_cliente (
-	id_cliente			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_cliente				SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_admin				SMALLINT,
-	id_sindico			SMALLINT,
-	id_tipo_cliente	TINYINT		NOT NULL,
-	telefone 			VARCHAR(11) NOT NULL,
+	id_sindico				SMALLINT,
+	id_tipo_cliente			TINYINT		NOT NULL,
+	telefone 				VARCHAR(11) NOT NULL,
 	nome			 		VARCHAR(40)	NOT NULL,
 	email					VARCHAR(100),
 	cnpj					VARCHAR(255)	UNIQUE,
