@@ -1,4 +1,6 @@
-<?php include 'conexao.php'; 
+<?php 
+    include 'conexao.php'; 
+
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit;
@@ -13,7 +15,29 @@ $stmt->execute();
 $result = $stmt->get_result();
 $ficha = $result->fetch_assoc();
 
-echo"Nome do cliente: " . $ficha['nome'];
+ $arquivo = $ficha['cnpj'];
 
+    if (file_exists($arquivo)) {
+        header("Content-Type: application/pdf");
+        header("Content-Disposition: inline; filename=\"".basename($arquivo)."\"");
+        readfile($arquivo);
+        exit;
+    }
 
+echo"
+    <div class='ficha-cliente'>
+        <div class='ficha-details'>
+            <h2>Ficha do Cliente</h2>
+            <p>Nome do cliente: " . $ficha['nome'] . "
+            <br>Telefone: " . $ficha['telefone'] . "
+            <br>Email: " . $ficha['email'] . "
+            <br>Endereço: " . $ficha['rua'] . ", "
+            . $ficha['numero'] . ", " 
+            . $ficha['bairro'] . ", "
+            . $ficha['cidade'] . "</p>
+        </div>
+        <div class='cnpj-ficha'>
+            <img class=\"cnpj-img\" src=\"../backend/php/visualizar_cnpj.php?id={$ficha['id_cliente']}\"
+        </div>
+    </div>";
 ?>

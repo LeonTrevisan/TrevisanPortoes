@@ -88,6 +88,20 @@
             transition: all 0.2s;
         }
 
+        .btn-cnpj{
+            background-color: #f8f9fa;
+            color: #2c3e50;
+            border-radius: 10px;
+            padding: 0.6rem 0.8rem;
+            border: solid 1px;
+            font-size: 0.80rem;
+            cursor: pointer;
+        }
+
+        .btn-cnpj:hover{
+            background-color: #e2e6ea;
+        }
+
         .btn-primary {
             background-color: #3498db;
             color: white;
@@ -308,4 +322,39 @@
 
         .cond-info.active{
             display: block;
+        }
+
+        .ficha-cliente{
+            max-width: 80%;
+            margin: auto;
+            background-color: #fff;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 6px;
+            display: flex;
+            gap: 5rem;
+        }
+
+        .ficha-cliente h2{
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .ficha-cliente p{
+            margin-bottom: 1rem;
+            font-size: 1rem;
+            color: #34495e;
+        }
+
+        .ficha-cliente img{
+            margin-top: 1rem;
+            max-width: 100%;
+            width: 150%;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .ficha-details{
+            font-weight: 500;
+            line-height: 2;
         }

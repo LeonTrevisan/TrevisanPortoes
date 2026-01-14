@@ -109,9 +109,9 @@
             </div>
 
             <!-- Ficha do cliente -->
-             <section id="ficha" class="page">
-                <?php //include '../backend/php/ficha_cliente.php'; ?>
-            </section>
+             <div id="ficha" class="page">
+                <?php include '../backend/php/ficha_cliente.php'; ?>
+            </div>
 
             <!-- Serviços -->
             <div id="servicos" class="page">
