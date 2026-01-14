@@ -31,7 +31,7 @@
 
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Serviços Agendados</h3>
+                        <h3>Pagamentos Pendentes</h3>
                         <div class="value">8</div>
                     </div>
                     <div class="stat-card">
@@ -45,14 +45,14 @@
                 </div>
 
                 <div class="card">
-                    <h3 style="margin-bottom: 1rem;">Próximos Serviços</h3>
+                    <h3 style="margin-bottom: 1rem;">Últimos Serviços</h3>
                     <table>
                         <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
                                 <th>Serviço</th>
-                                <th>Status</th>
+                                <th>Status Pagamento</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -60,19 +60,19 @@
                                 <td>07/01/2026</td>
                                 <td>João Silva</td>
                                 <td>Manutenção Preventiva</td>
-                                <td><span class="status status-agendado">Agendado</span></td>
+                                <td><span class="status status-agendado">Pendente</span></td>
                             </tr>
                             <tr>
                                 <td>08/01/2026</td>
                                 <td>Maria Santos</td>
                                 <td>Instalação de Equipamento</td>
-                                <td><span class="status status-agendado">Agendado</span></td>
+                                <td><span class="status status-agendado">Pendente</span></td>
                             </tr>
                             <tr>
                                 <td>09/01/2026</td>
                                 <td>Pedro Costa</td>
                                 <td>Reparo de Sistema</td>
-                                <td><span class="status status-agendado">Agendado</span></td>
+                                <td><span class="status status-agendado">Pendente</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -109,9 +109,9 @@
             </div>
 
             <!-- Ficha do cliente -->
-             <div id="ficha" class="page">
+            <section id="ficha" class="page">
                 <?php include '../backend/php/ficha_cliente.php'; ?>
-            </div>
+            </section>
 
             <!-- Serviços -->
             <div id="servicos" class="page">

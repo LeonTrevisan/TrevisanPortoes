@@ -19,7 +19,7 @@
             <td>" . $value['tipo_cliente'] . "</td>
             <td>
                 <div class='action-buttons'>
-                    <a ?id={$value['id_cliente']} onclick=\"showPage('ficha')\" class='btn btn-primary btn-small'>Ver Ficha</a>
+                    <button data-id=\"<?=id={$value['id_cliente']}\" onclick=\"showPage('ficha')\" class='btn btn-primary btn-small'>Ver Ficha</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>
