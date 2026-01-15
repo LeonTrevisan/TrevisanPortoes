@@ -75,20 +75,17 @@ CREATE TABLE tb_endereco (
 
 CREATE TABLE tb_tipo_servico (
 	id_tipo				TINYINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	tipo_servico		VARCHAR(10)	NOT null
-	) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+	tipo_servico		VARCHAR(50)	NOT null
+	) CHARACTER SET utf8mb4 COLLATE UTF8MB4_UNICODE_CI;
 	
-CREATE TABLE tb_status_servico (
-	id_status			TINYINT		NOT NULL AUTO_INCREMENT	PRIMARY KEY,
-	status_servico		VARCHAR(10)	NOT null
-	) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
 CREATE TABLE tb_servico (
 	id_servico			INT 			NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	id_cliente			SMALLINT		NOT NULL,
 	id_tipo				TINYINT		NOT NULL,
-	id_status			TINYINT		NOT NULL,
 	descricao			VARCHAR(100),
+	observacao			VARCHAR(100),
+	foto					VARCHAR(255),
+	comprovante			VARCHAR(255),
 	data_hora			DATETIME		NOT NULL,
 	
 	FOREIGN KEY (id_cliente) REFERENCES tb_cliente(id_cliente) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -113,7 +110,7 @@ CREATE TABLE tb_status_pagamento(
 CREATE TABLE tb_pagamento (
 	id_pagamento			INT				NOT NULL AUTO_INCREMENT	PRIMARY KEY,
 	id_servico				INT				NOT NULL,
-	id_forma_pagamento	TINYINT			NOT NULL,
+	id_forma_pagamento	TINYINT			,
 	valor						DECIMAL(10,2) 	NOT NULL,
 	id_status				TINYINT			NOT NULL,
 	
