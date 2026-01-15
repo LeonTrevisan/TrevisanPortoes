@@ -15,13 +15,20 @@
             echo "<td> <a href=\"../backend/php/visualizar_cnpj.php?id={$value['id_cliente']}\"> <button class=\"btn-cnpj\"> Visualizar CNPJ </button> </a></td>";}
             else { 
             echo "<td> Não possui CNPJ </td>"; }
-        echo"
+        echo "
             <td>" . $value['tipo_cliente'] . "</td>
             <td>
                 <div class='action-buttons'>
-                    <button data-id=\"<?=id={$value['id_cliente']}\" onclick=\"showPage('ficha')\" class='btn btn-primary btn-small'>Ver Ficha</button>
+                    <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_cliente']} ?>)\">Ver Ficha ".$value['id_cliente']."</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>
         </tr>
-         "; } ?>
+         "; } 
+
+    function option($clients) {
+        foreach ($clients as $value)
+            echo "<option value=\"" . htmlspecialchars($value['id_cliente']) . "\">" . htmlspecialchars($value['nome']) . "</option>";
+    }
+    
+    ?>

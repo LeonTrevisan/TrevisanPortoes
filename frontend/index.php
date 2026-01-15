@@ -15,10 +15,10 @@
 
     <div class="container">
         <div class="sidebar">
-            <div class="menu-item active" onclick="showPage('dashboard')">Dashboard</div>
-            <div class="menu-item" onclick="showPage('clientes')">Clientes</div>
-            <div class="menu-item" onclick="showPage('servicos')">Serviços</div>
-            <div class="menu-item" onclick="showPage('pecas')">Peças e Materiais</div>
+            <div class="menu-item active" onclick="showPage('dashboard', this)">Dashboard</div>
+            <div class="menu-item" onclick="showPage('clientes', this)">Clientes</div>
+            <div class="menu-item" onclick="showPage('servicos', this)">Serviços</div>
+            <div class="menu-item" onclick="showPage('pecas', this)">Peças e Materiais</div>
         </div>
 
         <div class="main-content">
@@ -102,16 +102,26 @@
                             </tr>
                         </thead>
                         <tbody id="clientesTable">
-                            <?php include "../backend/php/lista_clientes.php"; ?>
+                            <?php include "../backend/php/lista_clientes.php";
+                            ?>
                         </tbody>
                     </table>
                 </div>
             </div>
 
             <!-- Ficha do cliente -->
-            <section id="ficha" class="page">
-                <?php include '../backend/php/ficha_cliente.php'; ?>
-            </section>
+            <div id="ficha" class="page">
+                <div class="page-header">
+                    <h2>Ficha do Cliente</h2>
+                    <p>Detalhes completos do cliente</p>
+                </div>
+
+                <div id="fichaContent">
+                    <?php 
+                        include "../backend/php/ficha_cliente.php";  
+                    ?>
+                </div>
+            </div>
 
             <!-- Serviços -->
             <div id="servicos" class="page">
@@ -121,8 +131,6 @@
                 </div>
 
                 <button class="btn btn-primary" onclick="openModal('modalServico')">Novo Serviço</button>
-
-                <div class="card">
                     <table>
                         <thead>
                             <tr>
@@ -163,7 +171,6 @@
                             </tr>
                         </tbody>
                     </table>
-                </div>
             </div>
 
             <!-- Peças e Materiais -->
@@ -235,10 +242,12 @@
             
             <form action="../backend/php/cadastro_cliente.php" method="post" enctype="multipart/form-data">
                 <div class="form-radio">
-                    <input type="radio" name="tipo-cliente" id="tipo-morador" value="Residencial" checked>Residencial</input>
+                    <input type="radio" name="tipo-cliente" id="tipo-morador" value="Residencial" checked />
+                    <label for="tipo-morador">Residencial</label>
                 </div>
                 <div class="form-radio">
-                    <input type="radio" name="tipo-cliente" id="tipo-condominio" value="Condomínio">Condomínio</input>
+                    <input type="radio" name="tipo-cliente" id="tipo-condominio" value="Condomínio" />
+                    <label for="tipo-condominio">Condomínio</label>
                 </div>
 
                 <div class="form-group">
@@ -252,9 +261,9 @@
                 </div>
 
                 <div id="condform" class="cond-info">
+                    <hr>
                     <div class="form-group">
                         <label>CNPJ</label>
-                        <input type="text" name="cnpj-cliente">
                         <input type="file" accept=".png, .jpg, .jpeg, .png" name="cnpj-doc">
                     </div>
                     <div class="form-group">
@@ -273,9 +282,9 @@
                             <?php include '../backend/php/lista_sindico.php'; ?> 
                         </select>
                     </div>
+                    <hr>
                 </div>
                
-                <div class="form-adress">
                 <div class="form-group">
                 <label>Rua</label>
                 <input type="text" name="rua-cliente" required>
@@ -296,7 +305,6 @@
                 <input type="text" name="cidade-cliente" required>
                 </div>
 
-            </div>
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-success">Salvar</button>
                     <button type="button" class="btn btn-danger">Cancelar</button>
@@ -315,10 +323,8 @@
             <form action="cadastro_servico.php" method="post">
                 <div class="form-group">
                     <label>Cliente</label>
-                    <select required>
-                        <option value="">Selecione um cliente</option>
-                        <option>João Silva</option>
-                        <option>Maria Santos</option>
+                    <select name="clientes" required>
+                        <?php  option($clients); ?>
                     </select>
                 </div>
                 <div class="form-group">
@@ -327,22 +333,42 @@
                 </div>
                 <div class="form-group">
                     <label>Tipo de Serviço</label>
-                    <input type="text" name="tipo" required>
+                    <select name="tipo" required>
+                        <?php include '../backend/php/lista_tipoServico.php'; ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Descrição</label>
-                    <textarea></textarea>
+                    <textarea name="descricao"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Observação</label>
+                    <textarea name="observacao"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Foto</label>
+                    <input type="file" accept=".png, .jpg, .jpeg" name="foto-servico">
+                </div>
+                <div class="form-group">
+                    <label>Comprovante</label>
+                    <input type="file" accept=".png, .jpg, .jpeg, .pdf" name="comprovante-servico">
                 </div>
                 <div class="form-group">
                     <label>Valor</label>
-                    <input type="number" step="0.01" required>
+                    <input name="preco" type="number" step="0.01" required>
                 </div>
                 <div class="form-group">
-                    <label>Status</label>
-                    <select required>
-                        <option>Agendado</option>
-                        <option>Concluído</option>
-                        <option>Cancelado</option>
+                    <label>Pagamento</label>
+                    <select  name="statusPagamento" id="statusPag" required>
+                        <?php include '../backend/php/statusPagamento.php';
+                        statusPagamento($pagamentos); ?>
+                    </select>
+                </div>
+                <div id="forma_pagamento" class="form-group">
+                    <label>Forma de pagamento</label>
+                    <select name="formaPagamento" id="formaPag" required>
+                        <?php include '../backend/php/formaPagamento.php';
+                        formaPagamento($pagamentos); ?>
                     </select>
                 </div>
                 <div class="modal-actions">

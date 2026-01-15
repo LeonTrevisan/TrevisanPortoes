@@ -1,4 +1,4 @@
-function showPage(pageId) {
+function showPage(pageId, element) {
     const pages = document.querySelectorAll('.page');
     const menuItems = document.querySelectorAll('.menu-item');
     
@@ -6,7 +6,8 @@ function showPage(pageId) {
     menuItems.forEach(item => item.classList.remove('active'));
     
     document.getElementById(pageId).classList.add('active');
-    event.target.classList.add('active');
+        
+    element.classList.add('active');
 }
 
 function openModal(modalId) {
@@ -39,3 +40,12 @@ radioMorador.addEventListener('change', verificarTipoCliente);
 radioCondominio.addEventListener('change', verificarTipoCliente);
 
 verificarTipoCliente();
+
+function carregarFicha(id) {
+    fetch('ficha_cliente.php?id=' + id)
+        .then(r => r.text())
+        .then(html => {
+            document.getElementById('conteudo').innerHTML = html;
+        });
+}
+

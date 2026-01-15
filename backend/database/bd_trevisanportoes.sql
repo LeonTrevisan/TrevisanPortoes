@@ -5,14 +5,14 @@ COLLATE UTF8MB4_UNICODE_CI;
 USE bd_trevisanportoes;
 
 CREATE TABLE tb_cliente (
-	id_cliente				SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	id_admin				SMALLINT,
-	id_sindico				SMALLINT,
-	id_tipo_cliente			TINYINT		NOT NULL,
-	telefone 				VARCHAR(11) NOT NULL,
-	nome			 		VARCHAR(40)	NOT NULL,
-	email					VARCHAR(100),
-	cnpj					VARCHAR(255)	UNIQUE,
+	id_cliente			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_admin			SMALLINT,
+	id_sindico			SMALLINT,
+	id_tipo_cliente		TINYINT		NOT NULL,
+	telefone 			VARCHAR(11) NOT NULL,
+	nome			 	VARCHAR(40)	NOT NULL,
+	email				VARCHAR(100),
+	cnpj				VARCHAR(255)	UNIQUE,
 	
 	INDEX idx_nome (nome),
 	INDEX idx_cnpj (cnpj),
@@ -23,7 +23,7 @@ CREATE TABLE tb_cliente (
 	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 	
 CREATE TABLE tb_tipo_cliente (
-	id_tipo_cliente	TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_tipo_cliente		TINYINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	tipo_cliente		VARCHAR(20),
 	
 	INDEX idx_tipo (tipo_cliente)
@@ -34,10 +34,10 @@ CREATE TABLE tb_tipo_cliente (
 	LATEST FOREIGN KEY ERROR
 	
 CREATE TABLE tb_admin_cond (
-	id_admin				SMALLINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	nome					VARCHAR(40)	NOT NULL,
-	telefone				VARCHAR(11)	NOT NULL,
-	email					VARCHAR(50)	NOT NULL,
+	id_admin			SMALLINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	nome				VARCHAR(40)	NOT NULL,
+	telefone			VARCHAR(11)	NOT NULL,
+	email				VARCHAR(50)	NOT NULL,
 	
 	INDEX idx_nome(nome)
 	)
@@ -45,8 +45,8 @@ CREATE TABLE tb_admin_cond (
 	
 CREATE TABLE tb_sindico (
 	id_sindico			SMALLINT		NOT NULL AUTO_INCREMENT PRIMARY KEY,
-	nome					VARCHAR(40)	NOT NULL,
-	telefone				VARCHAR(11)	NOT NULL,
+	nome				VARCHAR(40)	NOT NULL,
+	telefone			VARCHAR(11)	NOT NULL,
 	
 	INDEX idx_nome(nome)
 	)
@@ -84,7 +84,7 @@ CREATE TABLE tb_servico (
 	id_tipo				TINYINT		NOT NULL,
 	descricao			VARCHAR(100),
 	observacao			VARCHAR(100),
-	foto					VARCHAR(255),
+	foto				VARCHAR(255),
 	comprovante			VARCHAR(255),
 	data_hora			DATETIME		NOT NULL,
 	
@@ -108,11 +108,11 @@ CREATE TABLE tb_status_pagamento(
 	) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 	
 CREATE TABLE tb_pagamento (
-	id_pagamento			INT				NOT NULL AUTO_INCREMENT	PRIMARY KEY,
-	id_servico				INT				NOT NULL,
+	id_pagamento		INT				NOT NULL AUTO_INCREMENT	PRIMARY KEY,
+	id_servico			INT				NOT NULL,
 	id_forma_pagamento	TINYINT			,
-	valor						DECIMAL(10,2) 	NOT NULL,
-	id_status				TINYINT			NOT NULL,
+	valor				DECIMAL(10,2) 	NOT NULL,
+	id_status			TINYINT			NOT NULL,
 	
 	FOREIGN KEY (id_servico) REFERENCES tb_servico(id_servico) ON DELETE RESTRICT ON UPDATE CASCADE,
 	FOREIGN KEY (id_forma_pagamento) REFERENCES tb_forma_pagamento(id_forma_pagamento) ON DELETE RESTRICT ON UPDATE CASCADE,
@@ -123,11 +123,11 @@ CREATE TABLE tb_pagamento (
 CREATE TABLE tb_compras(
 	id_compra			INT				NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	data_compra			DATE				NOT NULL,
-	material				VARCHAR(50)		NOT NULL,
+	material			VARCHAR(50)		NOT NULL,
 	qtd_compra			TINYINT			NOT NULL,
-	valor_un				DECIMAL(10,2)	NOT NULL,
+	valor_un			DECIMAL(10,2)	NOT NULL,
 	valor_total			DECIMAL(10,2)	NOT NULL,
-	id_distribuidora INT
+	id_distribuidora 	INT
 	
 	FOREIGN KEY (id_distribuidora) REFERENCES tb_distribuidora (id_distribuidora) ON DELETE CASCADE ON UPDATE CASCADE;
 	
@@ -136,7 +136,7 @@ CREATE TABLE tb_compras(
 	CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 	
 CREATE TABLE tb_distribuidora(
-	id_distribuidora		INT			NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_distribuidora	INT			NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	nome_distribuidora	VARCHAR(20)	NOT NULL,
 	
 	INDEX idx_nome_distribuidora (nome_distribuidora)

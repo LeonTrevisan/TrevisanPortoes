@@ -8,8 +8,8 @@
    foreach($adm as $value) {
     echo "
         <option value='{$value['id_admin']}'>
-         {$value['nome']}
-          </option>
+            {$value['nome']}
+        </option>
         ";
    }
 ?>
