@@ -356,3 +356,10 @@
             font-weight: 500;
             line-height: 2;
         }
+
+        #forma_pagamento{
+            display: none;
+        }
+        #forma_pagamento.active{
+            display: block;
+        }

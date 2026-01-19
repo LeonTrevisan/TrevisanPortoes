@@ -142,33 +142,8 @@
                                 <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>05/01/2026</td>
-                                <td>João Silva</td>
-                                <td>Manutenção Preventiva</td>
-                                <td>R$ 450,00</td>
-                                <td><span class="status status-concluido">Concluído</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-primary btn-small">Editar</button>
-                                        <button class="btn btn-danger btn-small">Excluir</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>07/01/2026</td>
-                                <td>Maria Santos</td>
-                                <td>Instalação de Equipamento</td>
-                                <td>R$ 1.200,00</td>
-                                <td><span class="status status-agendado">Agendado</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-primary btn-small">Editar</button>
-                                        <button class="btn btn-danger btn-small">Excluir</button>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tbody id="servicosTable">
+                            <?php include "../backend/php/lista_servicos.php"; ?>
                         </tbody>
                     </table>
             </div>
@@ -318,13 +293,29 @@
     <div id="modalServico" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Novo Serviço</h3>
+                <h3 id="tituloModalServico">Novo Serviço</h3>
             </div>
-            <form action="cadastro_servico.php" method="post">
+            <form id="formServico" method="post" action="../backend/php/cadastro_servico.php" enctype="multipart/form-data">
+                <input type="hidden" id="id_servico" name="id_servico" value="">
                 <div class="form-group">
                     <label>Cliente</label>
                     <select name="clientes" required>
-                        <?php  option($clients); ?>
+                        <?php 
+                            $sql = "SELECT id_cliente, nome FROM tb_cliente ORDER BY nome ASC";
+                            $results = $conn->query($sql);
+                            if (!$results) {
+                                echo "<option value=''>Erro ao carregar clientes</option>";
+                            } else {
+                                $clients = $results->fetch_all(MYSQLI_ASSOC);
+                                if (empty($clients)) {
+                                    echo "<option value=''>Nenhum cliente cadastrado</option>";
+                                } else {
+                                    foreach ($clients as $client) {
+                                        echo "<option value=\"" . htmlspecialchars($client['id_cliente']) . "\">" . htmlspecialchars($client['nome']) . "</option>";
+                                    }
+                                }
+                            }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group">
@@ -334,7 +325,16 @@
                 <div class="form-group">
                     <label>Tipo de Serviço</label>
                     <select name="tipo" required>
-                        <?php include '../backend/php/lista_tipoServico.php'; ?>
+                        <?php 
+                            include '../backend/php/conexao.php';
+                            $sql = "SELECT * FROM tb_tipo_servico ORDER BY id_tipo ASC";
+                            $results = $conn->query($sql);
+                            if ($results) {
+                                while($row = $results->fetch_assoc()) {
+                                    echo "<option value=\"" . htmlspecialchars($row['id_tipo']) . "\">" . htmlspecialchars($row['tipo_servico']) . "</option>";
+                                }
+                            }
+                        ?>
                     </select>
                 </div>
                 <div class="form-group">
@@ -355,25 +355,41 @@
                 </div>
                 <div class="form-group">
                     <label>Valor</label>
-                    <input name="preco" type="number" step="0.01" required>
+                    <input name="preco" type="number" required>
                 </div>
                 <div class="form-group">
                     <label>Pagamento</label>
-                    <select  name="statusPagamento" id="statusPag" required>
-                        <?php include '../backend/php/statusPagamento.php';
-                        statusPagamento($pagamentos); ?>
+                    <select name="statusPagamento" id="statusPag" required>
+                        <?php 
+                            include '../backend/php/conexao.php';
+                            $sql = "SELECT * FROM tb_status_pagamento ORDER BY id_status ASC";
+                            $results = $conn->query($sql);
+                            if ($results) {
+                                while($row = $results->fetch_assoc()) {
+                                    echo "<option value=\"" . htmlspecialchars($row['id_status']) . "\">" . htmlspecialchars($row['status_pagamento']) . "</option>";
+                                }
+                            }
+                        ?>
                     </select>
                 </div>
                 <div id="forma_pagamento" class="form-group">
+                    <hr>
                     <label>Forma de pagamento</label>
                     <select name="formaPagamento" id="formaPag" required>
-                        <?php include '../backend/php/formaPagamento.php';
-                        formaPagamento($pagamentos); ?>
+                        <?php 
+                            $sql = "SELECT * FROM tb_forma_pagamento ORDER BY id_forma_pagamento ASC";
+                            $results = $conn->query($sql);
+                            if ($results) {
+                                while($row = $results->fetch_assoc()) {
+                                    echo "<option value=\"" . htmlspecialchars($row['id_forma_pagamento']) . "\">" . htmlspecialchars($row['forma_pagamento']) . "</option>";
+                                }
+                            }
+                        ?>
                     </select>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-danger" onclick="closeModal('modalServico')">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="submit" id="btnSalvarServico" class="btn btn-success">Salvar</button>
                 </div>
             </form>
         </div>
