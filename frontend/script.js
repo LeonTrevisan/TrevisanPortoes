@@ -77,6 +77,36 @@ function editarServico(id) {
         });
 }
 
+function editarCompra(id) {
+
+    fetch('../backend/php/obterCompra.php?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById('id_compra').value = data.id_compra;
+            document.querySelector('input[name="material"]').value = data.material;
+            document.querySelector('input[name="data_hora"]').value = data.data_compra;
+            document.querySelector('select[name="fornecedor"]').value = data.id_distribuidora;
+            document.querySelector('input[name="valor"]').value = data.valor_un;
+            document.querySelector('input[name="qtd"]').value = data.qtd_compra;
+
+            document.getElementById('tituloModalCompra').textContent = 'Editar Compra';
+            document.getElementById('btnSalvarCompra').textContent = 'Atualizar';
+            document.getElementById('formCompra').action = '../backend/php/editar_compra.php';
+
+            openModal('modalCompra');
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Erro ao carregar a compra');
+        });
+}
+
 function confirmarExclusao(id) {
     if (confirm('Tem certeza que deseja deletar este serviço?')) {
         window.location.href = '../backend/php/deletar_servico.php?id=' + id;

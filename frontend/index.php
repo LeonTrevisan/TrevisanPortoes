@@ -157,7 +157,6 @@
 
                 <button class="btn btn-primary" onclick="openModal('modalPeca')">Registrar Compra</button>
 
-                <div class="card">
                     <h3 style="margin-bottom: 1rem;">Compras do Mês - Janeiro 2026</h3>
                     <table>
                         <thead>
@@ -172,40 +171,12 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>02/01/2026</td>
-                                <td>Parafusos M6</td>
-                                <td>Fornecedor ABC</td>
-                                <td>100 un</td>
-                                <td>R$ 0,50</td>
-                                <td>R$ 50,00</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-primary btn-small">Editar</button>
-                                        <button class="btn btn-danger btn-small">Excluir</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>04/01/2026</td>
-                                <td>Cabo Elétrico 2,5mm</td>
-                                <td>Distribuidora XYZ</td>
-                                <td>50 m</td>
-                                <td>R$ 12,00</td>
-                                <td>R$ 600,00</td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="btn btn-primary btn-small">Editar</button>
-                                        <button class="btn btn-danger btn-small">Excluir</button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <?php include "../backend/php/lista_material.php"; ?>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
-    </div>
 
     <!-- Modal Cliente -->
     <div id="modalCliente" class="modal">
@@ -396,39 +367,46 @@
     </div>
 
     <!-- Modal Peça -->
-    <div id="modalPeca" class="modal">
+    <div id="modalCompra" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Registrar Compra</h3>
+                <h3 id="tituloModalCompra">Nova Compra</h3>
             </div>
-            <form>
+            <form id="formCompra" method="post" action="../backend/php/cadastro_compra.php" enctype="multipart/form-data">
+                <input type="hidden" id="id_compra" name="id_compra" value="">
                 <div class="form-group">
                     <label>Data da Compra</label>
-                    <input type="date" required>
+                    <input type="date" name="data_hora" required>
                 </div>
                 <div class="form-group">
-                    <label>Descrição do Material</label>
-                    <input type="text" required>
+                    <label>Material</label>
+                    <input type="text" name="material" required>
                 </div>
                 <div class="form-group">
                     <label>Fornecedor</label>
-                    <input type="text" required>
+                    <select name="fornecedor" required>
+                        <?php 
+                            $sql = "SELECT * FROM tb_distribuidora ORDER BY nome_distribuidora ASC";
+                            $results = $conn->query($sql);
+                            if ($results) {
+                                while($row = $results->fetch_assoc()) {
+                                    echo "<option value=\"" . htmlspecialchars($row['id_distribuidora']) . "\">" . htmlspecialchars($row['nome_distribuidora']) . "</option>";
+                                }
+                            }
+                        ?>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Quantidade</label>
-                    <input type="text" required>
+                    <input type="text" name="qtd" required>
                 </div>
                 <div class="form-group">
                     <label>Valor Unitário</label>
-                    <input type="number" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label>Observações</label>
-                    <textarea></textarea>
+                    <input type="number" name="valor" step="0.1" required>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-danger" onclick="closeModal('modalPeca')">Cancelar</button>
-                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="submit" id="btnSalvarCompra" class="btn btn-success">Salvar</button>
                 </div>
             </form>
         </div>
