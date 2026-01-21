@@ -1,9 +1,12 @@
 <?php
     include 'conexao.php';
 
-    $sql = "SELECT * FROM tb_compras c
+        $mes = $_POST['filtro-mes'] ?? date('m');
+            $sql = "SELECT * FROM tb_compras c
             LEFT JOIN tb_distribuidora t ON c.id_distribuidora = t.id_distribuidora
+            WHERE MONTH(c.data_compra) = '$mes'
             ORDER BY c.material ASC";
+
     $results = $conn -> query($sql);
     $material = $results->fetch_all(MYSQLI_ASSOC);
 
@@ -26,3 +29,4 @@
          "; } 
     
 ?>
+

@@ -363,3 +363,28 @@
         #forma_pagamento.active{
             display: block;
         }
+
+        .select-filter,
+        ::picker(select){
+            margin-right: 1rem;
+            appearance: base-select;
+            padding: 0.7rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .select-filter option{
+            padding: 0.5rem;
+        }
+
+        .select-filter:open::picker-icon{
+            rotate: -180deg;
+            transition: .5s all;
+        }
+
+        .menu-compra{
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            justify-content: space-between;
+        }

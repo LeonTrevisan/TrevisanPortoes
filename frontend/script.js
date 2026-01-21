@@ -190,4 +190,71 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Substitua a seção de filtro de materiais no final do seu script.js por isto:
 
+function filtrarMateriais(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Filtrando materiais...');
+    const mesSelecionado = document.getElementById('filtro').value;
+    console.log('Mês selecionado:', mesSelecionado);
+    
+    fetch('../backend/php/lista_material.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'filtro-mes=' + encodeURIComponent(mesSelecionado)
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('Dados recebidos, atualizando tabela');
+        // Encontra a tabela correta dentro da seção #pecas
+        const tbody = document.querySelector('#pecas table tbody');
+        if (tbody) {
+            tbody.innerHTML = data;
+            console.log('Tabela atualizada com sucesso');
+        } else {
+            console.error('tbody não encontrado');
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao filtrar materiais:', error);
+        alert('Erro ao carregar os dados. Tente novamente.');
+    });
+    
+    return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Configurando filtro de materiais');
+    
+    // Procura pelo formulário correto
+    const formFiltro = document.getElementById('formFiltro');
+    const selectFiltro = document.getElementById('filtro');
+    const btnFiltrar = document.getElementById('btnFiltrar');
+    
+    if (formFiltro) {
+        formFiltro.addEventListener('submit', filtrarMateriais);
+        console.log('Listener adicionado ao formulário');
+    } else {
+        console.warn('Formulário formFiltro não encontrado');
+    }
+    
+    if (selectFiltro) {
+        // Também filtra ao mudar o select (mais intuitivo)
+        selectFiltro.addEventListener('change', filtrarMateriais);
+        console.log('Listener de change adicionado ao select');
+    }
+    
+    if (btnFiltrar) {
+        btnFiltrar.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            filtrarMateriais(e);
+            return false;
+        });
+        console.log('Listener adicionado ao botão');
+    }
+});

@@ -5,7 +5,7 @@
         $id_compra = intval($_POST['id_compra']);
         $id_distribuidora = intval($_POST['fornecedor']);
         $material = $_POST['material'];
-        $data_hora = $_POST['data_hora'] . " " . date("H:i:s");
+        $data_hora = $_POST['data_hora'];
         $valor = floatval($_POST['valor']);
         $quantidade = intval($_POST['qtd']);
         $valor_total = $valor * $quantidade;
@@ -20,7 +20,7 @@
             die("Erro ao preparar statement: " . $conn->error);
         }
 
-        $stmt->bind_param("iissdid", $id_compra, $id_distribuidora, $material, $data_hora, $valor, $quantidade, $valor_total);
+        $stmt->bind_param("iissdidi", $id_compra, $id_distribuidora, $material, $data_hora, $valor, $quantidade, $valor_total, $id_compra);
         
         if (!$stmt->execute()) {
             die("Erro ao atualizar serviço: " . $stmt->error);

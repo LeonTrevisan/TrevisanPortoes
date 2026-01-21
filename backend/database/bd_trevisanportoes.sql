@@ -137,6 +137,9 @@ ALTER TABLE tb_pagamento
 	FOREIGN KEY (id_status) REFERENCES tb_status_pagamento(id_status)
 	ON DELETE RESTRICT ON UPDATE CASCADE;
 	
+ALTER TABLE tb_compras
+	ADD FOREIGN KEY (id_distribuidora) REFERENCES tb_distribuidora (id_distribuidora)
+	ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- Inserts
 INSERT INTO tb_tipo_cliente (tipo_cliente) VALUES

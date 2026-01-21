@@ -154,10 +154,28 @@
                     <h2>Peças e Materiais</h2>
                     <p>Controle de compras mensais</p>
                 </div>
+                <div class="menu-compra">
+                    <button class="btn btn-primary" onclick="openModal('modalCompra')">Registrar Compra</button>
 
-                <button class="btn btn-primary" onclick="openModal('modalPeca')">Registrar Compra</button>
-
-                    <h3 style="margin-bottom: 1rem;">Compras do Mês - Janeiro 2026</h3>
+                    <div class="filtro" id="filtro-mes">
+                        <form id="formFiltro" onsubmit="return filtrarMateriais(event);">
+                            <select name="filtro-mes" id="filtro" class="select-filter">
+                                <option value="01">Janeiro</option>
+                                <option value="02">Fevereiro</option>
+                                <option value="03">Março</option>
+                                <option value="04">Abril</option>
+                                <option value="05">Maio</option>
+                                <option value="06">Junho</option>
+                                <option value="07">Julho</option>
+                                <option value="08">Agosto</option>
+                                <option value="09">Setembro</option>
+                                <option value="10">Outubro</option>
+                                <option value="11">Novembro</option>
+                                <option value="12">Dezembro</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
                     <table>
                         <thead>
                             <tr>
@@ -405,7 +423,7 @@
                     <input type="number" name="valor" step="0.1" required>
                 </div>
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-danger" onclick="closeModal('modalPeca')">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modalCompra')">Cancelar</button>
                     <button type="submit" id="btnSalvarCompra" class="btn btn-success">Salvar</button>
                 </div>
             </form>
