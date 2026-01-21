@@ -107,6 +107,33 @@ function editarCompra(id) {
         });
 }
 
+function editarSindico(id) {
+
+    fetch('../backend/php/obterSindico.php?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById('id_sindico').value = data.id_sindico;
+            document.querySelector('input[name="nome-sindico"]').value = data.nome;
+            document.querySelector('input[name="tel-sindico"]').value = data.telefone;
+
+            document.getElementById('tituloModalSindico').textContent = 'Editar Sindico';
+            document.getElementById('btnSalvarSindico').textContent = 'Atualizar';
+            document.getElementById('formSindico').action = '../backend/php/editarSindico.php';
+
+            openModal('modalSindico');
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Erro ao carregar');
+        });
+}
+
 function confirmarExclusao(id, tipo) {
     if (confirm('Tem certeza que deseja deletar?')) {
         window.location.href = '../backend/php/deletar_' + tipo + '.php?id=' + id;

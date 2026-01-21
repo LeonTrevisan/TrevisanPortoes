@@ -374,10 +374,11 @@
     <div id="modalSindico" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Novo Síndico</h3>
+                <h3 id="tituloModalSindico">Novo Síndico</h3>
             </div>
 
-            <form action="../backend/php/cadastro_sindico.php" method="post" enctype="multipart/form-data">
+            <form id="formSindico" action="../backend/php/cadastro_sindico.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="id_sindico" name="id_sindico" value="">
 
                 <div class="form-group">
                     <label>Nome Completo</label>
@@ -390,7 +391,7 @@
                 </div>
                    
                 <div class="modal-actions">
-                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button id="btnSalvarSindico" type="submit" class="btn btn-success">Salvar</button>
                     <button type="button" class="btn btn-danger">Cancelar</button>
                 </div>
             </form>

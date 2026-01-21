@@ -25,7 +25,7 @@
             <td>
                 <div class='action-buttons'>
                     <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_sindico']} ?>)\">Ficha</button>
-                    <button class='btn btn-primary btn-small'>Editar</button>
+                    <button class='btn btn-primary btn-small' onclick=\"editarSindico(" . intval($value['id_sindico']) . ")\">Editar</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>
