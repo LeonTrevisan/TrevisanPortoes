@@ -1,4 +1,8 @@
-<?php include '../backend/php/conexao.php';?>
+<?php 
+    include '../backend/php/conexao.php';
+    include "../backend/php/lista_administrador.php";     
+    include "../backend/php/lista_sindico.php";     
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -17,6 +21,8 @@
         <div class="sidebar">
             <div class="menu-item active" onclick="showPage('dashboard', this)">Dashboard</div>
             <div class="menu-item" onclick="showPage('clientes', this)">Clientes</div>
+            <div class="menu-item" onclick="showPage('admin', this)">Adminsitradores</div>
+            <div class="menu-item" onclick="showPage('sindico', this)">Síndicos</div>
             <div class="menu-item" onclick="showPage('servicos', this)">Serviços</div>
             <div class="menu-item" onclick="showPage('pecas', this)">Peças e Materiais</div>
         </div>
@@ -88,7 +94,7 @@
 
                 <button class="btn btn-primary" onclick="openModal('modalCliente')">Novo Cliente</button>
 
-                <input type="text" class="search-bar" placeholder="Buscar cliente por nome, telefone ou documento">
+                <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
 
                 <div class="clients">
                     <table>
@@ -120,6 +126,61 @@
                     <?php 
                         include "../backend/php/ficha_cliente.php";  
                     ?>
+                </div>
+            </div>
+
+            <!-- Adminsitradores -->
+            <div id="admin" class="page">
+                <div class="page-header">
+                    <h2>Adminsitradores</h2>
+                    <p>Gerencie os administradores de condomínio</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="openModal('modalAdm')">Novo Administrador</button>
+
+                <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
+
+                <div class="clients">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTable">
+                            <?php listaAdm();?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Síndicos -->
+            <div id="sindico" class="page">
+                <div class="page-header">
+                    <h2>Síndicos</h2>
+                    <p>Gerencie os síndicos de condomínio</p>
+                </div>
+
+                <button class="btn btn-primary" onclick="openModal('modalSindico')">Novo Síndico</button>
+
+                <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
+
+                <div class="clients">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Telefone</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminTable">
+                            <?php listaSindico();?>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -202,7 +263,6 @@
             <div class="modal-header">
                 <h3>Novo Cliente</h3>
             </div>
-
             
             <form action="../backend/php/cadastro_cliente.php" method="post" enctype="multipart/form-data">
                 <div class="form-radio">
@@ -237,13 +297,13 @@
                     <div class="form-group">
                         <label>Adminsitrador</label>
                         <select name="adm-cliente">
-                            <?php include '../backend/php/lista_administrador.php'; ?>    
+                            <?php selectAdm(); ?>    
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Síndico</label>
                         <select name="sindico-cliente">
-                            <?php include '../backend/php/lista_sindico.php'; ?> 
+                            <?php selectSindico(); ?> 
                         </select>
                     </div>
                     <hr>
@@ -273,6 +333,65 @@
                     <button type="submit" class="btn btn-success">Salvar</button>
                     <button type="button" class="btn btn-danger">Cancelar</button>
                    
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Admin -->
+    <div id="modalAdm" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Administrador</h3>
+            </div>
+
+            <form action="../backend/php/cadastro_admin.php" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="nome-admin" required>
+                </div>
+
+                 <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" name="tel-admin" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" name="email-admin">
+                </div>
+                   
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="button" class="btn btn-danger">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Síndico -->
+    <div id="modalSindico" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Novo Síndico</h3>
+            </div>
+
+            <form action="../backend/php/cadastro_sindico.php" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label>Nome Completo</label>
+                    <input type="text" name="nome-sindico" required>
+                </div>
+
+                 <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="tel" name="tel-sindico" required>
+                </div>
+                   
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button type="button" class="btn btn-danger">Cancelar</button>
                 </div>
             </form>
         </div>

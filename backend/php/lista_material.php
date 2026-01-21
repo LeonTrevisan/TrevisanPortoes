@@ -22,7 +22,7 @@
             <td>
                 <div class='action-buttons'>
                     <button class='btn btn-primary btn-small' onclick=\"editarCompra(" . intval($value['id_compra']) . ")\" >Editar</button>
-                    <button class='btn btn-danger btn-small'>Excluir</button>
+                    <button class='btn btn-danger btn-small' onclick=\"confirmarExclusao(" . intval($value['id_compra']) . ", 'compra')\">Excluir</button>
                 </div>
             </td>
         </tr>

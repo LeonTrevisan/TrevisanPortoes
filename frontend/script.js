@@ -107,9 +107,9 @@ function editarCompra(id) {
         });
 }
 
-function confirmarExclusao(id) {
-    if (confirm('Tem certeza que deseja deletar este serviço?')) {
-        window.location.href = '../backend/php/deletar_servico.php?id=' + id;
+function confirmarExclusao(id, tipo) {
+    if (confirm('Tem certeza que deseja deletar?')) {
+        window.location.href = '../backend/php/deletar_' + tipo + '.php?id=' + id;
     }
 }
 

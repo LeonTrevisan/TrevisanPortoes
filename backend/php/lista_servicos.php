@@ -41,7 +41,7 @@ foreach ($servicos as $servico) {
         <td>
             <div class='action-buttons'>
                 <button class='btn btn-primary btn-small' onclick=\"editarServico(" . intval($servico['id_servico']) . ")\">Editar</button>
-                <button class='btn btn-danger btn-small' onclick=\"confirmarExclusao(" . intval($servico['id_servico']) . ")\">Excluir</button>
+                <button class='btn btn-danger btn-small' onclick=\"confirmarExclusao(" . intval($servico['id_servico']) . ", 'servico')\">Excluir</button>
             </div>
         </td>
     </tr>

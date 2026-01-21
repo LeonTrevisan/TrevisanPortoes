@@ -19,16 +19,11 @@
             <td>" . $value['tipo_cliente'] . "</td>
             <td>
                 <div class='action-buttons'>
-                    <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_cliente']} ?>)\">Ver Ficha ".$value['id_cliente']."</button>
+                    <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_cliente']} ?>)\">Ficha</button>
+                    <button class='btn btn-primary btn-small'>Editar</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>
         </tr>
          "; } 
-
-    function option($clients) {
-        foreach ($clients as $value)
-            echo "<option value=\"" . htmlspecialchars($value['id_cliente']) . "\">" . htmlspecialchars($value['nome']) . "</option>";
-    }
-    
     ?>

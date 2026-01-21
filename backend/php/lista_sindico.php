@@ -5,11 +5,31 @@
    $results = $conn -> query($sql);
    $sindico = $results -> fetch_all(MYSQLI_ASSOC) ;
 
-   foreach($sindico as $value) {
-    echo "
-        <option value='{$value['id_sindico']}'>
-         {$value['nome']}
-          </option>
-        ";
+   function selectSindico(){
+    global $sindico;
+    foreach($sindico as $value) {
+        echo "
+            <option value='{$value['id_sindico']}'>
+                {$value['nome']}
+            </option>";
+    }
+   }
+
+   function listaSindico(){
+    global $sindico;
+    foreach($sindico as $value) {
+        echo "
+            <tr>
+            <td>" . $value['nome'] . "</td>
+            <td>" . $value['telefone'] . "</td>
+            <td>
+                <div class='action-buttons'>
+                    <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_sindico']} ?>)\">Ficha</button>
+                    <button class='btn btn-primary btn-small'>Editar</button>
+                    <button class='btn btn-danger btn-small'>Excluir</button>
+                </div>
+            </td>
+        </tr>";
+    }
    }
 ?>
