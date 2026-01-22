@@ -190,23 +190,59 @@
                     <h2>Serviços</h2>
                     <p>Gerencie serviços agendados e prestados</p>
                 </div>
-
-                <button class="btn btn-primary" onclick="openModal('modalServico')">Novo Serviço</button>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Data</th>
-                                <th>Cliente</th>
-                                <th>Serviço</th>
-                                <th>Valor</th>
-                                <th>Status</th>
-                                <th>Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="servicosTable">
-                            <?php include "../backend/php/lista_servicos.php"; ?>
-                        </tbody>
-                    </table>
+                <div class="menu">
+                    <button class="btn btn-primary" onclick="openModal('modalServico')">Novo Serviço</button>
+                    <div class="filtro-servico">
+                        <label>Filtrar por:</label>
+                        <select id="tipo-filtro" class="select-filter" onchange="atualizarOpcoesFiltro()">
+                            <option value="periodo">Período</option>
+                            <option value="ano">Ano</option>
+                        </select>
+                        
+                        <!-- Filtro por Período -->
+                        <div id="filtro-periodo-container" style="display: inline-block; margin-left: 10px;">
+                            <label>Últimos:</label>
+                            <select id="filtro-periodo" class="select-filter">
+                                <option value="7">7 Dias</option>
+                                <option value="30" selected>30 Dias</option>
+                                <option value="365">1 Ano</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Filtro por Ano -->
+                        <?php
+                            $anoAtual = date('Y');
+                            $anoInicio = $anoAtual - 4;
+                        ?>
+                        <div id="filtro-ano-container" style="display: none; margin-left: 10px;">
+                            <label>Ano:</label>
+                            <select id="filtro-ano" class="select-filter">
+                                <option value="">Selecione um ano</option>
+                                <?php for ($ano = $anoAtual; $ano >= $anoInicio; $ano--) {
+                                    echo"
+                                <option value=\"$ano\">$ano</option>";
+                                }
+                            ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <input type="text" class="search-bar" placeholder="Buscar por cliente">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Cliente</th>
+                            <th>Serviço</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicosTable">
+                        <?php include "../backend/php/lista_servicos.php"; ?>
+                    </tbody>
+                </table>
             </div>
 
             <!-- Peças e Materiais -->
@@ -215,7 +251,7 @@
                     <h2>Peças e Materiais</h2>
                     <p>Controle de compras mensais</p>
                 </div>
-                <div class="menu-compra">
+                <div class="menu">
                     <button class="btn btn-primary" onclick="openModal('modalCompra')">Registrar Compra</button>
 
                     <div class="filtro" id="filtro-mes">
@@ -364,7 +400,7 @@
                    
                 <div class="modal-actions">
                     <button type="submit" class="btn btn-success">Salvar</button>
-                    <button type="button" class="btn btn-danger">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modalAdm')">Cancelar</button>
                 </div>
             </form>
         </div>
@@ -392,7 +428,7 @@
                    
                 <div class="modal-actions">
                     <button id="btnSalvarSindico" type="submit" class="btn btn-success">Salvar</button>
-                    <button type="button" class="btn btn-danger">Cancelar</button>
+                    <button type="button" class="btn btn-danger" onclick="closeModal('modalSindico')">Cancelar</button>
                 </div>
             </form>
         </div>

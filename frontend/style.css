@@ -382,9 +382,10 @@
             transition: .5s all;
         }
 
-        .menu-compra{
+        .menu{
             display: flex;
             gap: 1rem;
             margin-bottom: 1.5rem;
             justify-content: space-between;
+            align-items: center;
         }

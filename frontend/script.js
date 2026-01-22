@@ -217,7 +217,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Substitua a seção de filtro de materiais no final do seu script.js por isto:
 
 function filtrarMateriais(event) {
     event.preventDefault();
@@ -285,3 +284,106 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Listener adicionado ao botão');
     }
 });
+
+// Função para alternar entre filtro por período e ano
+function atualizarOpcoesFiltro() {
+    const tipoFiltro = document.getElementById('tipo-filtro').value;
+    const periodContainer = document.getElementById('filtro-periodo-container');
+    const anoContainer = document.getElementById('filtro-ano-container');
+    
+    if (tipoFiltro === 'periodo') {
+        periodContainer.style.display = 'inline-block';
+        anoContainer.style.display = 'none';
+    } else {
+        periodContainer.style.display = 'none';
+        anoContainer.style.display = 'inline-block';
+    }
+    
+    // Recarregar com novo filtro
+    filtrarServicos();
+}
+
+// Função para filtrar serviços por período ou ano
+function filtrarServicos() {
+    const tipoFiltro = document.getElementById('tipo-filtro').value;
+    let parametroFiltro = '';
+    
+    if (tipoFiltro === 'periodo') {
+        parametroFiltro = document.getElementById('filtro-periodo').value;
+    } else {
+        parametroFiltro = document.getElementById('filtro-ano').value;
+    }
+    
+    // Fazer requisição ao servidor
+    fetch('../backend/php/lista_servicos.php?filtro-periodo=' + encodeURIComponent(parametroFiltro))
+        .then(response => response.text())
+        .then(html => {
+            // Atualizar o conteúdo da tabela
+            const tbody = document.getElementById('servicosTable');
+            if (tbody) {
+                tbody.innerHTML = html;
+            }
+        })
+        .catch(error => console.error('Erro ao filtrar serviços:', error));
+}
+
+// Adicionar listeners aos selects de filtro
+document.addEventListener('DOMContentLoaded', function() {
+    const selectPeriodo = document.getElementById('filtro-periodo');
+    const selectAno = document.getElementById('filtro-ano');
+    
+    if (selectPeriodo) {
+        selectPeriodo.addEventListener('change', filtrarServicos);
+    }
+    
+    if (selectAno) {
+        selectAno.addEventListener('change', filtrarServicos);
+    }
+    
+    // Carregar com filtro padrão ao abrir a página
+    filtrarServicos();
+});
+
+// Funções para modais
+function openModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Fechar modal ao clicar fora
+document.addEventListener('click', function(event) {
+    if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+    }
+});
+
+// Função para exibir páginas
+function showPage(pageId, element) {
+    // Ocultar todas as páginas
+    const pages = document.querySelectorAll('.page');
+    pages.forEach(page => page.classList.remove('active'));
+    
+    // Remover classe active de todos os menu-items
+    const menuItems = document.querySelectorAll('.menu-item');
+    menuItems.forEach(item => item.classList.remove('active'));
+    
+    // Mostrar página selecionada
+    const page = document.getElementById(pageId);
+    if (page) {
+        page.classList.add('active');
+    }
+    
+    // Adicionar classe active ao menu-item
+    if (element) {
+        element.classList.add('active');
+    }
+}
