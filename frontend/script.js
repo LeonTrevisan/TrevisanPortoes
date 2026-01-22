@@ -134,6 +134,34 @@ function editarSindico(id) {
         });
 }
 
+function editarAdmin(id) {
+
+    fetch('../backend/php/obterAdmin.php?id=' + id)
+        .then(response => response.json())
+        .then(data => {
+
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            document.getElementById('id_admin').value = data.id_admin;
+            document.querySelector('input[name="nome-admin"]').value = data.nome;
+            document.querySelector('input[name="tel-admin"]').value = data.telefone;
+            document.querySelector('input[name="email-admin"]').value = data.email;
+
+            document.getElementById('tituloModalAdmin').textContent = 'Editar Administrador';
+            document.getElementById('btnSalvarAdmin').textContent = 'Atualizar';
+            document.getElementById('formAdmin').action = '../backend/php/editarAdmin.php';
+
+            openModal('modalAdm');
+        })
+        .catch(error => {
+            console.error(error);
+            alert('Erro ao carregar');
+        });
+}
+
 function confirmarExclusao(id, tipo) {
     if (confirm('Tem certeza que deseja deletar?')) {
         window.location.href = '../backend/php/deletar_' + tipo + '.php?id=' + id;

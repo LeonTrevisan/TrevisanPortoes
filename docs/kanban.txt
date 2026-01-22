@@ -1,0 +1,10 @@
+A fazer
+	- Editar cliente
+	- Excluir Cliente
+	- Excluir Admin
+	- Excluir Síndico
+	- Ficha Cliente
+	- Ficha Serviço
+
+Em andamento
+	- Editar Admin

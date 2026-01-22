@@ -21,7 +21,7 @@
         echo "
             <tr>
             <td>" . $value['nome'] . "</td>
-            <td>" . $value['telefone'] . "</td>
+            <td>" . formatarTelefone($value['telefone']) . "</td>
             <td>
                 <div class='action-buttons'>
                     <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_sindico']} ?>)\">Ficha</button>

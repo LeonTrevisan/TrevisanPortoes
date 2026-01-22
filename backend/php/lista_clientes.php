@@ -10,7 +10,7 @@
         echo "
         <tr>
             <td>" . $value['nome'] . "</td>
-            <td>" . $value['telefone'] . "</td>";
+            <td>" . formatarTelefone($value['telefone']) . "</td>";
             if (!empty($value['cnpj'])) {
             echo "<td> <a href=\"../backend/php/visualizar_cnpj.php?id={$value['id_cliente']}\"> <button class=\"btn-cnpj\"> Visualizar CNPJ </button> </a></td>";}
             else { 

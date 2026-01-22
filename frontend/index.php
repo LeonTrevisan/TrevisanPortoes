@@ -1,7 +1,8 @@
 <?php 
     include '../backend/php/conexao.php';
     include "../backend/php/lista_administrador.php";     
-    include "../backend/php/lista_sindico.php";     
+    include "../backend/php/lista_sindico.php";  
+    require_once '../backend/php/helper/formatacao.php';
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -91,9 +92,9 @@
                     <h2>Gestão de Clientes</h2>
                     <p>Visualize e gerencie todos os clientes</p>
                 </div>
-
+                <div class="menu">
                 <button class="btn btn-primary" onclick="openModal('modalCliente')">Novo Cliente</button>
-
+                </div>
                 <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
 
                 <div class="clients">
@@ -124,7 +125,7 @@
 
                 <div id="fichaContent">
                     <?php 
-                        include "../backend/php/ficha_cliente.php";  
+                        //include "../backend/php/ficha_cliente.php";  
                     ?>
                 </div>
             </div>
@@ -136,7 +137,9 @@
                     <p>Gerencie os administradores de condomínio</p>
                 </div>
 
+                <div class="menu">
                 <button class="btn btn-primary" onclick="openModal('modalAdm')">Novo Administrador</button>
+                </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
 
@@ -164,7 +167,9 @@
                     <p>Gerencie os síndicos de condomínio</p>
                 </div>
 
+                <div class="menu">
                 <button class="btn btn-primary" onclick="openModal('modalSindico')">Novo Síndico</button>
+                </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
 
@@ -378,10 +383,12 @@
     <div id="modalAdm" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Novo Administrador</h3>
+                <h3 id="tituloModalAdmin">Novo Administrador</h3>
             </div>
 
-            <form action="../backend/php/cadastro_admin.php" method="post" enctype="multipart/form-data">
+            <form id="formAdmin" action="../backend/php/cadastro_admin.php" method="post" enctype="multipart/form-data">
+
+                <input type="hidden" id="id_admin" name="id_admin" value="">
 
                 <div class="form-group">
                     <label>Nome Completo</label>
@@ -399,7 +406,7 @@
                 </div>
                    
                 <div class="modal-actions">
-                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button id="btnSalvarAdmin" type="submit" class="btn btn-success">Salvar</button>
                     <button type="button" class="btn btn-danger" onclick="closeModal('modalAdm')">Cancelar</button>
                 </div>
             </form>

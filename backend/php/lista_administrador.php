@@ -21,12 +21,12 @@
         echo "
             <tr>
             <td>" . $value['nome'] . "</td>
-            <td>" . $value['telefone'] . "</td>
+            <td>" . formatarTelefone($value['telefone']) . "</td>
             <td>" . $value['email'] . "</td>
             <td>
                 <div class='action-buttons'>
                     <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_admin']} ?>)\">Ficha</button>
-                    <button class='btn btn-primary btn-small'>Editar</button>
+                    <button class='btn btn-primary btn-small' onclick=\"editarAdmin(" . intval($value['id_admin']) . ")\">Editar</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>

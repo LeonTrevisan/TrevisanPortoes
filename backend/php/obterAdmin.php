@@ -11,8 +11,8 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int) $_GET['id'];
 
-$sql = "SELECT * FROM tb_sindico
-        WHERE id_sindico = ?";
+$sql = "SELECT * FROM tb_admin_cond
+        WHERE id_admin = ?";
 
 $stmt = $conn->prepare($sql);
 
@@ -26,7 +26,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
-    echo json_encode(['error' => 'Síndico não encontrado']);
+    echo json_encode(['error' => 'Administrador não encontrado']);
     exit;
 }
 

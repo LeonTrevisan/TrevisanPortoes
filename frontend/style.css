@@ -377,9 +377,12 @@
             padding: 0.5rem;
         }
 
+        .select-filter::picker-icon{
+            rotate: -90deg;
+        }
+
         .select-filter:open::picker-icon{
-            rotate: -180deg;
-            transition: .5s all;
+            rotate: 0deg;
         }
 
         .menu{
@@ -388,4 +391,10 @@
             margin-bottom: 1.5rem;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .filtro-servico label{
+            font-weight: 500;
+            color: #2c3e50;
+            margin-right: 0.5rem;
         }
