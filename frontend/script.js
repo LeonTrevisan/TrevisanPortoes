@@ -46,6 +46,40 @@ function carregarFicha(id) {
         });
 }
 
+function editarCliente(id) {
+    console.log('Editando cliente ID:', id);
+    
+    fetch('../backend/php/obter_cliente.php?id=' + id)
+        .then(response => response.text())
+        .then(text => {
+            console.log('Resposta recebida');
+            const data = JSON.parse(text);
+            
+            document.getElementById('id_cliente').value = data.id_cliente;
+            document.getElementById('select[name="tipo-cliente"]').value = data.id_tipo_cliente;
+            document.querySelector('select[name="nome-cliente"]').value = data.nome;
+            document.querySelector('input[name="email-cliente"]').value = data.email;
+            document.querySelector('input[name="tel-cliente"]').value = data.telefone;
+            document.querySelector('input[name="cnpj-doc"]').value = data.cnpj;
+            document.querySelector('select[name="adm-cliente"]').value = data.id_admin;
+            document.querySelector('select[name="sindico-cliente"]').value = data.id_sindico;
+            document.querySelector('input[name="rua-cliente"]').value = data.rua;
+            document.querySelector('input[name="bairro-cliente"]').value = data.bairro;
+            document.querySelector('input[name="num-cliente"]').value = data.numero;
+            document.querySelector('input[name="cidade-cliente"]').value = data.cidade;
+            
+            document.getElementById('tituloModalCliente').textContent = 'Editar Cliente';
+            document.getElementById('btnSalvarCliente').textContent = 'Atualizar';
+            document.getElementById('formCliente').action = '../backend/php/editar_cliente.php';
+            
+            openModal('modalCliente');
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao carregar o serviço: ' + error.message);
+        });
+}
+
 function editarServico(id) {
     console.log('Editando serviço ID:', id);
     
@@ -236,13 +270,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Verificar se há mensagens de sucesso
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('status') === 'success') {
-        const msg = urlParams.get('msg');
-        if (msg) {
+    const status = urlParams.get('status');
+    const msg = urlParams.get('msg');
+
+    if (status && msg) {
+        if (status === 'success') {
             alert(msg);
-            window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (status === 'error') {
+            alert('Erro: ' + msg);
         }
-    }
+
+    // Limpa a URL depois de mostrar a mensagem
+    window.history.replaceState({}, document.title, window.location.pathname);
+}
+
 });
 
 

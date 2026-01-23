@@ -19,8 +19,7 @@
             <td>" . $value['tipo_cliente'] . "</td>
             <td>
                 <div class='action-buttons'>
-                    <button class='btn btn-primary btn-small' onclick=\"showPage('ficha', this); carregarFicha(<? {$value['id_cliente']} ?>)\">Ficha</button>
-                    <button class='btn btn-primary btn-small'>Editar</button>
+                    <button class='btn btn-primary btn-small' onclick=\"editarCliente(" . intval($value['id_cliente']) . ")\">Editar</button>
                     <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>

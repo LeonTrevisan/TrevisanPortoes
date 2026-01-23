@@ -7,9 +7,10 @@
             die("Erro: Preencha todos os campos obrigatórios.");
         }
 
-        $id_sindico = intval($_POST['id_admin']);
+        $id_admin = intval($_POST['id_admin']);
         $nome = $_POST['nome-admin'];
         $telefone = $_POST['tel-admin'];
+        $email = $_POST['email-admin']; 
 
         // Atualizar serviço no banco de dados
         $sql = "UPDATE tb_admin_cond 

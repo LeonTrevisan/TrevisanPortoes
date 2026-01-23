@@ -182,7 +182,7 @@
                                 <th>Ações</th>
                             </tr>
                         </thead>
-                        <tbody id="adminTable">
+                        <tbody id="sindicoTable">
                             <?php listaSindico();?>
                         </tbody>
                     </table>
@@ -302,10 +302,12 @@
     <div id="modalCliente" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Novo Cliente</h3>
+                <h3 id="titleModalCliente">Novo Cliente</h3>
             </div>
             
             <form action="../backend/php/cadastro_cliente.php" method="post" enctype="multipart/form-data">
+                <input type="hidden" id="id_cliente" name="id_cliente" value="">
+
                 <div class="form-radio">
                     <input type="radio" name="tipo-cliente" id="tipo-morador" value="Residencial" checked />
                     <label for="tipo-morador">Residencial</label>
@@ -371,7 +373,7 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button type="submit" class="btn btn-success">Salvar</button>
+                    <button id="btnSalvarCliente" type="submit" class="btn btn-success">Salvar</button>
                     <button type="button" class="btn btn-danger">Cancelar</button>
                    
                 </div>
