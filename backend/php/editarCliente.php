@@ -8,15 +8,14 @@
         }
 
         $id_cliente = intval($_POST['id_cliente']);
-        $id_admin = intval($_POST['admin-cliente']);
+        $id_endereco = intval($_POST['id_endereco'] ?? 0);
+        $id_admin = intval($_POST['adm-cliente']);
         $id_sindico = intval($_POST['sindico-cliente']);
-        $id_tipo_cliente = intval($_POST['tipo-cliente']);
         $email = $conn->real_escape_string($_POST['email-cliente']);
         $telefone = $conn->real_escape_string($_POST['tel-cliente']);
         $nome = $conn->real_escape_string($_POST['nome-cliente']);
-        $id_endereco = intval($_POST['id_endereco']);
         $rua = $conn->real_escape_string($_POST['rua-cliente']);
-        $numero = $conn->real_escape_string($_POST['numero-cliente']);
+        $numero = $conn->real_escape_string($_POST['num-cliente']);
         $bairro = $conn->real_escape_string($_POST['bairro-cliente']);
         $cidade = $conn->real_escape_string($_POST['cidade-cliente']); 
 
@@ -61,7 +60,7 @@
 
         // Atualizar serviço no banco de dados
         $sql = "UPDATE tb_cliente 
-                SET id_cliente = ?, id_tipo_cliente = ?, id_admin = ?, id_sindico = ?, cnpj = ?, email = ?, telefone = ?, nome = ? 
+                SET id_cliente = ?, id_admin = ?, id_sindico = ?, cnpj = ?, email = ?, telefone = ?, nome = ? 
                 WHERE id_cliente = ?";
         
         $stmt = $conn->prepare($sql);
@@ -69,7 +68,7 @@
             die("Erro ao preparar statement: " . $conn->error);
         }
 
-        $stmt->bind_param("iiiissssi", $id_cliente, $id_tipo_cliente, $id_admin, $id_sindico, $cnpj, $email, $telefone, $nome, $id_cliente);
+        $stmt->bind_param("iiissssi", $id_cliente, $id_admin, $id_sindico, $cnpj, $email, $telefone, $nome, $id_cliente);
         
         if (!$stmt->execute()) {
             die("Erro ao atualizar serviço: " . $stmt->error);
@@ -79,7 +78,7 @@
 
         // Atualizar endereço associado ao cliente
         $sql_pagamento = "UPDATE tb_endereco
-                         SET id_endereco = ?, id_cliente = ?, rua = ?, numero = ?, bairro = ?, cidade = ?
+                         SET rua = ?, numero = ?, bairro = ?, cidade = ?
                          WHERE id_cliente = ?";
         
         $stmt_pagamento = $conn->prepare($sql_pagamento);
@@ -87,7 +86,7 @@
             die("Erro ao preparar statement de pagamento: " . $conn->error);
         }
 
-        $stmt_pagamento->bind_param("iisissi", $id_endereco, $id_cliente, $rua, $numero, $bairro, $cidade, $id_endereco);
+        $stmt_pagamento->bind_param("sissi", $rua, $numero, $bairro, $cidade, $id_endereco);
         
         if (!$stmt_pagamento->execute()) {
             die("Erro ao atualizar pagamento: " . $stmt_pagamento->error);

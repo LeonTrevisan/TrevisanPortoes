@@ -1,7 +1,7 @@
 <?php
 include 'conexao.php';
 
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 if (!isset($_GET['id']) || empty($_GET['id'])) {
     http_response_code(400);
@@ -15,18 +15,17 @@ $sql = "SELECT
     s.id_cliente,
     s.id_admin,
     d.id_sindico,
-    a.id_tipo,
     s.nome,
     s.telefone,
     s.email,
     s.cnpj,
+    p.id_endereco,
     p.rua,
     p.numero,
     p.bairro,
     p.cidade
 FROM tb_cliente s
 LEFT JOIN tb_endereco p ON s.id_cliente = p.id_cliente
-LEFT JOIN tb_tipo_cliente a ON s.id_tipo = a.id_tipo
 LEFT JOIN tb_sindico d ON s.id_sindico = d.id_sindico
 WHERE s.id_cliente = ?";
 
@@ -57,16 +56,18 @@ if (!$cliente) {
 // Garantir que todos os campos existem (para evitar undefined no JavaScript)
 $cliente = array_merge([
     'id_cliente' => null,
-    'id_tipo' => null,
+    'id_admin' => null,
+    'id_sindico' => null,
     'nome' => '',
     'telefone' => '',
+    'email' => '',
+    'cnpj' => '',
     'rua' => '',
     'bairro' => '',
     'cidade' => '',
     'numero' => 0
 ], $cliente);
 
-header('Content-Type: application/json; charset=utf-8');
 echo json_encode($cliente);
 exit;
 ?>

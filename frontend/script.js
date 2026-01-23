@@ -49,34 +49,46 @@ function carregarFicha(id) {
 function editarCliente(id) {
     console.log('Editando cliente ID:', id);
     
-    fetch('../backend/php/obter_cliente.php?id=' + id)
+    fetch('../backend/php/obterCliente.php?id=' + id)
         .then(response => response.text())
         .then(text => {
             console.log('Resposta recebida');
             const data = JSON.parse(text);
             
+            // Preenchendo os campos do formulário
             document.getElementById('id_cliente').value = data.id_cliente;
-            document.getElementById('select[name="tipo-cliente"]').value = data.id_tipo_cliente;
-            document.querySelector('select[name="nome-cliente"]').value = data.nome;
-            document.querySelector('input[name="email-cliente"]').value = data.email;
-            document.querySelector('input[name="tel-cliente"]').value = data.telefone;
-            document.querySelector('input[name="cnpj-doc"]').value = data.cnpj;
-            document.querySelector('select[name="adm-cliente"]').value = data.id_admin;
-            document.querySelector('select[name="sindico-cliente"]').value = data.id_sindico;
-            document.querySelector('input[name="rua-cliente"]').value = data.rua;
-            document.querySelector('input[name="bairro-cliente"]').value = data.bairro;
-            document.querySelector('input[name="num-cliente"]').value = data.numero;
-            document.querySelector('input[name="cidade-cliente"]').value = data.cidade;
+        
+            // Campos de texto
+            document.querySelector('input[name="nome-cliente"]').value = data.nome || '';
+            document.querySelector('input[name="tel-cliente"]').value = data.telefone || '';
+            document.querySelector('input[name="email-cliente"]').value = data.email || '';
+            document.querySelector('input[name="rua-cliente"]').value = data.rua || '';
+            document.querySelector('input[name="bairro-cliente"]').value = data.bairro || '';
+            document.querySelector('input[name="num-cliente"]').value = data.numero || '';
+            document.querySelector('input[name="cidade-cliente"]').value = data.cidade || '';
             
-            document.getElementById('tituloModalCliente').textContent = 'Editar Cliente';
+            // Selects
+            document.querySelector('select[name="adm-cliente"]').value = data.id_admin || '';
+            document.querySelector('select[name="sindico-cliente"]').value = data.id_sindico || '';
+            
+            // Campo oculto para id_endereco (adicione se não existir no HTML)
+            const idEnderecoField = document.querySelector('input[name="id_endereco"]');
+            if (idEnderecoField) {
+                idEnderecoField.value = data.id_endereco || '';
+            }
+            
+            // Atualizar modal e formulário
+            document.getElementById('titleModalCliente').textContent = 'Editar Cliente';
             document.getElementById('btnSalvarCliente').textContent = 'Atualizar';
-            document.getElementById('formCliente').action = '../backend/php/editar_cliente.php';
+            
+            const form = document.querySelector('#modalCliente form');
+            form.action = '../backend/php/editarCliente.php';
             
             openModal('modalCliente');
         })
         .catch(error => {
             console.error('Erro:', error);
-            alert('Erro ao carregar o serviço: ' + error.message);
+            alert('Erro ao carregar o cliente: ' + error.message);
         });
 }
 

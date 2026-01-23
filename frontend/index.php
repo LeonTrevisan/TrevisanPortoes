@@ -109,24 +109,9 @@
                             </tr>
                         </thead>
                         <tbody id="clientesTable">
-                            <?php include "../backend/php/lista_clientes.php";
-                            ?>
+                            <?php include "../backend/php/lista_clientes.php";?>
                         </tbody>
                     </table>
-                </div>
-            </div>
-
-            <!-- Ficha do cliente -->
-            <div id="ficha" class="page">
-                <div class="page-header">
-                    <h2>Ficha do Cliente</h2>
-                    <p>Detalhes completos do cliente</p>
-                </div>
-
-                <div id="fichaContent">
-                    <?php 
-                        //include "../backend/php/ficha_cliente.php";  
-                    ?>
                 </div>
             </div>
 

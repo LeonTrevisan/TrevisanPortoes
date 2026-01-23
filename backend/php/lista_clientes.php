@@ -20,7 +20,6 @@
             <td>
                 <div class='action-buttons'>
                     <button class='btn btn-primary btn-small' onclick=\"editarCliente(" . intval($value['id_cliente']) . ")\">Editar</button>
-                    <button class='btn btn-danger btn-small'>Excluir</button>
                 </div>
             </td>
         </tr>
