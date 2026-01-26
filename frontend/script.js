@@ -208,11 +208,32 @@ function editarAdmin(id) {
         });
 }
 
-function confirmarExclusao(id, tipo) {
-    if (confirm('Tem certeza que deseja deletar?')) {
-        window.location.href = '../backend/php/deletar_' + tipo + '.php?id=' + id;
+function alterarStatus(id, tipo, acao) {
+    const msg = acao === 'desativar' ? 'Tem certeza que deseja desativar?' : 'Tem certeza que deseja ativar?';
+    if(!confirm(msg)) {
+        return;
     }
-}
+
+    fetch('../backend/php/alterarStatus.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            tipo: tipo,
+            id: id,
+            acao: acao
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert(data.msg || 'Status alterado com sucesso');
+            location.reload();
+        } else {
+            alert(data.msg || 'Erro ao alterar status');
+        }
+    });}
 
 window.onclick = function(event) {
     if (event.target.classList.contains('modal')) {
