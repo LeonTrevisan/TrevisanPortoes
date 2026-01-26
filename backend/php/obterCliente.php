@@ -14,7 +14,9 @@ $id_cliente = intval($_GET['id']);
 $sql = "SELECT 
     s.id_cliente,
     s.id_admin,
-    d.id_sindico,
+    s.id_sindico,
+    s.id_tipo_cliente,
+    t.tipo_cliente,
     s.nome,
     s.telefone,
     s.email,
@@ -26,7 +28,7 @@ $sql = "SELECT
     p.cidade
 FROM tb_cliente s
 LEFT JOIN tb_endereco p ON s.id_cliente = p.id_cliente
-LEFT JOIN tb_sindico d ON s.id_sindico = d.id_sindico
+LEFT JOIN tb_tipo_cliente t ON s.id_tipo_cliente = t.id_tipo_cliente
 WHERE s.id_cliente = ?";
 
 $stmt = $conn->prepare($sql);
@@ -58,6 +60,7 @@ $cliente = array_merge([
     'id_cliente' => null,
     'id_admin' => null,
     'id_sindico' => null,
+    'id_tipo_cliente' => null,
     'nome' => '',
     'telefone' => '',
     'email' => '',

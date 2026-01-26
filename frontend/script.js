@@ -57,6 +57,7 @@ function editarCliente(id) {
             
             // Preenchendo os campos do formulário
             document.getElementById('id_cliente').value = data.id_cliente;
+            document.querySelector('input[name="tipo-cliente"][value="' + data.tipo_cliente + '"]').checked = true;
         
             // Campos de texto
             document.querySelector('input[name="nome-cliente"]').value = data.nome || '';
@@ -68,8 +69,8 @@ function editarCliente(id) {
             document.querySelector('input[name="cidade-cliente"]').value = data.cidade || '';
             
             // Selects
-            document.querySelector('select[name="adm-cliente"]').value = data.id_admin || '';
-            document.querySelector('select[name="sindico-cliente"]').value = data.id_sindico || '';
+            document.querySelector('select[name="adm-cliente"]').value = data.id_admin;
+            document.querySelector('select[name="sindico-cliente"]').value = data.id_sindico;
             
             // Campo oculto para id_endereco (adicione se não existir no HTML)
             const idEnderecoField = document.querySelector('input[name="id_endereco"]');
@@ -270,21 +271,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar elementos de cliente
     const radioMorador = document.getElementById('tipo-morador');
     const radioCondominio = document.getElementById('tipo-condominio');
-    const condInfo = document.querySelector('#condform');
-    
-    if (radioMorador && radioCondominio && condInfo) {
-        function verificarTipoCliente() {
-            if (radioCondominio && radioCondominio.checked) {
-                condInfo.classList.add('active');
-            } else {
-                condInfo.classList.remove('active');
-            }
-        }
-        
-        radioMorador.addEventListener('change', verificarTipoCliente);
-        radioCondominio.addEventListener('change', verificarTipoCliente);
-        verificarTipoCliente();
+
+    function toggleCondominio(tipo) {
+    const condForm = document.getElementById('condform');
+    if (!condForm) return;
+
+    if (tipo === 'Condomínio') {
+        condForm.style.display = 'block';
+    } else {
+        condForm.style.display = 'none';
     }
+}
+
+document.querySelectorAll('input[name="tipo-cliente"]').forEach(radio => {
+    radio.addEventListener('change', function () {
+        toggleCondominio(this.value);
+    });
+});
+        
+radioTipo.checked = true;
+radioTipo.dispatchEvent(new Event('change'));
 
     // Forma de pagamento visibility
     const statusPagamento = document.getElementById('statusPag');

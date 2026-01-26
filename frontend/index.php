@@ -183,6 +183,24 @@
                 <div class="menu">
                     <button class="btn btn-primary" onclick="openModal('modalServico')">Novo Serviço</button>
                     <div class="filtro-servico">
+                        <div id="filtro-pagamento" class="filtro-servico">
+                            <label>Pagamento:</label>
+                            <label for="filtro-pagamento">
+                                <input type="radio" name="filtroPag" id="pagTodos" value="todos" checked>
+                                Todos
+                            </label>
+                            
+                            <label for="filtro-pagamento">
+                                <input type="radio" name="filtroPag" id="pagPendente" value="pendente">
+                                Pendente
+                            </label>
+                            
+                            <label for="filtro-pagamento">
+                                <input type="radio" name="filtroPag" id="pagPago" value="pago">
+                                Pagos
+                            </label>
+                            
+                        </div>
                         <label>Filtrar por:</label>
                         <select id="tipo-filtro" class="select-filter" onchange="atualizarOpcoesFiltro()">
                             <option value="periodo">Período</option>

@@ -398,3 +398,9 @@
             color: #2c3e50;
             margin-right: 0.5rem;
         }
+
+        #filtro-pagamento{
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+        }

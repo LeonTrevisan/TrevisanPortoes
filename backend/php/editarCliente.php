@@ -28,39 +28,9 @@
         $cliente_atual = $result->fetch_assoc();
         $stmt_select->close();
 
-        $cnpj = $cliente_atual['cnpj'];
-
-        // Criar diretórios de upload se não existirem
-        $upload_dir_cnpj = __DIR__ . '/../docs/uploads/CNPJ';
-
-        if (!is_dir($upload_dir_cnpj)) {
-            mkdir($upload_dir_cnpj, 0755, true);
-        }
-
-        // Upload da nova foto
-        if (isset($_FILES['cnpj']) && $_FILES['cnpj']['error'] == 0) {
-            $file_ext = strtolower(pathinfo($_FILES['cnpj']['name'], PATHINFO_EXTENSION));
-            $allowed_ext = ['jpg', 'jpeg', 'png'];
-            
-            if (in_array($file_ext, $allowed_ext)) {
-                // Deletar foto anterior se existir
-                if (!empty($cnpj)) {
-                    $cnpj_path = __DIR__ . '/../docs/uploads/CNPJ/' . $cnpj;
-                    if (file_exists($cnpj_path)) {
-                        unlink($cnpj_path);
-                    }
-                }
-                
-                $cnpj_name = "cnpj_" . time() . "_" . uniqid() . "." . $file_ext;
-                if (move_uploaded_file($_FILES['cnpj']['tmp_name'], $upload_dir_cnpj . $cnpj_name)) {
-                    $cnpj = "uploads/CNPJ/" . $cnpj_name;
-                }
-            }
-        }
-
         // Atualizar serviço no banco de dados
         $sql = "UPDATE tb_cliente 
-                SET id_cliente = ?, id_admin = ?, id_sindico = ?, cnpj = ?, email = ?, telefone = ?, nome = ? 
+                SET id_cliente = ?, id_admin = ?, id_sindico = ?, email = ?, telefone = ?, nome = ? 
                 WHERE id_cliente = ?";
         
         $stmt = $conn->prepare($sql);
@@ -68,7 +38,7 @@
             die("Erro ao preparar statement: " . $conn->error);
         }
 
-        $stmt->bind_param("iiissssi", $id_cliente, $id_admin, $id_sindico, $cnpj, $email, $telefone, $nome, $id_cliente);
+        $stmt->bind_param("iiisssi", $id_cliente, $id_admin, $id_sindico, $email, $telefone, $nome, $id_cliente);
         
         if (!$stmt->execute()) {
             die("Erro ao atualizar serviço: " . $stmt->error);

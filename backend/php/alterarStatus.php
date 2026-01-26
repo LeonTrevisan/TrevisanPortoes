@@ -12,10 +12,10 @@ $tipo = $data['tipo'];
 $id   = (int) $data['id'];
 $acao = $data['acao'];
 
-$mapa = [
-    'admin' => ['tabela' => 'tb_admin_cond', 'id' => 'id_admin'],
-    'cliente' => ['tabela' => 'tb_cliente', 'id' => 'id_cliente'],
-    'sindico' => ['tabela' => 'tb_sindico', 'id' => 'id_sindico']
+$mapa = [   
+    'admin'     =>  ['tabela' => 'tb_admin_cond', 'id' => 'id_admin'],
+    'cliente'   =>  ['tabela' => 'tb_cliente', 'id' => 'id_cliente'],
+    'sindico'   =>  ['tabela' => 'tb_sindico', 'id' => 'id_sindico']
 ];
 
 if (!isset($mapa[$tipo])) {
@@ -23,21 +23,14 @@ if (!isset($mapa[$tipo])) {
     exit();
 }
 
-if($acao === 'desativar'){
-    $deleted_at = date(Y-m-s);
-}
-else{
-    $deleted_at = NULL;
-}
-
 $sql = "
     UPDATE {$mapa[$tipo]['tabela']}
-    SET deleted_at = ?
+    SET deleted_at = IF(deleted_at IS NULL, CURDATE(), NULL)
     WHERE {$mapa[$tipo]['id']} = ?
 ";
 
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("si", $deleted_at, $id);
+$stmt->bind_param("i", $id);
 $stmt->execute();
 
 echo json_encode([

@@ -1,17 +1,19 @@
 <?php 
     include 'conexao.php';
 
-   $sql = "SELECT * from tb_admin_cond ORDER BY nome ASC";
+   $sql = "SELECT * from tb_admin_cond ORDER BY nome ASC, deleted_at ASC";
    $results = $conn -> query($sql);
    $adm = $results -> fetch_all(MYSQLI_ASSOC) ;
 
     function selectAdm(){
         global $adm;
-        foreach($adm as $value) {
-            echo "
-                <option value='{$value['id_admin']}'>
-                    {$value['nome']}
-                </option>";
+                foreach($adm as $value) {
+                if ($value['deleted_at'] === NULL) {
+                echo "
+                    <option value='{$value['id_admin']}'>
+                        {$value['nome']}
+                    </option>";
+            }
         }
    }
 
