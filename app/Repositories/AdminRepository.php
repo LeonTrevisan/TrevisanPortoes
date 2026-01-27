@@ -26,7 +26,7 @@ class AdminRepository
 
     public function findById(int $id): ?array
     {
-        $db = Database::getConnection();
+        $db = Database::connect();
         $stmt = $db->prepare("
             SELECT * 
             FROM tb_admin_cond 
@@ -41,7 +41,7 @@ class AdminRepository
 
     public function getAll(): array
     {
-        $db = Database::getConnection();
+        $db = Database::connect();
         $stmt = $db->query("
             SELECT * 
             FROM tb_admin_cond 
@@ -53,7 +53,7 @@ class AdminRepository
 
     public function getAtivos(): array
     {
-        $db = Database::getConnection();
+        $db = Database::connect();
         $stmt = $db->query("
             SELECT * 
             FROM tb_admin_cond 
