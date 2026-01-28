@@ -39,6 +39,14 @@ class AdminRepository
         return $stmt->fetch() ?: null;
     }
 
+     public function atualizarDeletedAt(int $id, ?string $deletedAt): void
+    {
+        Database::execute(
+            "UPDATE admins SET deleted_at = ? WHERE id = ?",
+            [$deletedAt, $id]
+        );
+    }
+
     public function getAll(): array
     {
         $db = Database::connect();
