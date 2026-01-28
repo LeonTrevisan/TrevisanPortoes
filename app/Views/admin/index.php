@@ -8,9 +8,17 @@
             <button onclick="editarAdmin(<?= $admin['id_admin'] ?>)">Editar</button>
 
             <?php if ($admin['deleted_at'] === null): ?>
-                <button onclick="alterarStatus(<?= $admin['id_admin'] ?>, 'admin', 'desativar')">Desativar</button>
+                <form method="POST" action="/desativar">
+                    <input type="hidden" name="tipo" value="cliente">
+                    <input type="hidden" name="id" value="<?= $cliente['id'] ?>">
+                    <button type="submit">Desativar</button>
+                </form>
             <?php else: ?>
-                <button onclick="alterarStatus(<?= $admin['id_admin'] ?>, 'admin', 'ativar')">Ativar</button>
+                <form method="POST" action="/ativar">
+                    <input type="hidden" name="tipo" value="cliente">
+                    <input type="hidden" name="id" value="<?= $cliente['id'] ?>">
+                    <button type="submit">Reativar</button>
+                </form>
             <?php endif; ?>
         </div>
     </td>
