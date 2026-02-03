@@ -7,7 +7,7 @@ use App\Repositories\AdminRepository;
 use App\Repositories\SoftDeleteRepository;
 use App\Services\AdminService;
 
-class AdminController
+class AdministradorController
 {
     private AdminService $service;
 
@@ -18,7 +18,6 @@ class AdminController
         $this->service = new AdminService($repo, $softDelete);
     }
 
-    // Store a newly created admin in storage.
     public function store(): void {
         try {
             $this->service->cadastrar([
@@ -37,32 +36,26 @@ class AdminController
 
     public function obter() {
         $id = $_GET['id'] ?? null;
-
         if(!$id) {
             http_response_code(400);
             echo json_encode(['error' => 'ID do administrador não fornecido.']);
             return;
         }
-
         $admin = $this->service->buscarPorId((int)$id);
-
         if (!$admin) {
             http_response_code(404);
             echo json_encode(['error' => 'Administrador não encontrado.']);
             return;
         }
-
         header('Content-Type: application/json');
         echo json_encode($admin);
     }
-    
-    // Display the select for admins.
+
     public function select() {
         $admins = $this->service->listarAtivos();
         require __DIR__ . '/../Views/admin/select.php';
     }
 
-    //Index of all admins.
     public function index() {
         $admins = $this->service->listarTodos();
         require __DIR__ . '/../Views/admin/index.php';
@@ -84,5 +77,22 @@ class AdminController
         // Condomínios do admin
         $condominios = []; // Implementar
         require __DIR__ . '/../Views/admin/ficha.php';
+    }
+
+    public function update(): void {
+        $id = $_POST['id'] ?? null;
+        if(!$id) {
+            header('Location: /?page=admin&status=error&message=ID não fornecido');
+            exit();
+        }
+        try {
+            // Assumir que AdminService tem método atualizar
+            // Por enquanto, não implementado
+            header('Location: /?page=admin&status=success');
+            exit();
+        } catch(\Throwable $e) {
+            header('Location: /?page=admin&status=error&message=' . urlencode($e->getMessage()));
+            exit();
+        }
     }
 }

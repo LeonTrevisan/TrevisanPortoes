@@ -9,10 +9,10 @@ class SoftDeleteRepository
     /**
      * Desativa um registro usando deleted_at
      */
-    public function desativar(string $tabela, int $id): void
+    public function desativar(string $tabela, int $id, string $idColumn = 'id'): void
     {
         Database::execute(
-            "UPDATE {$tabela} SET deleted_at = NOW() WHERE id = ?",
+            "UPDATE {$tabela} SET deleted_at = NOW() WHERE {$idColumn} = ?",
             [$id]
         );
     }
@@ -20,10 +20,10 @@ class SoftDeleteRepository
     /**
      * Reativa um registro
      */
-    public function reativar(string $tabela, int $id): void
+    public function reativar(string $tabela, int $id, string $idColumn = 'id'): void
     {
         Database::execute(
-            "UPDATE {$tabela} SET deleted_at = NULL WHERE id = ?",
+            "UPDATE {$tabela} SET deleted_at = NULL WHERE {$idColumn} = ?",
             [$id]
         );
     }

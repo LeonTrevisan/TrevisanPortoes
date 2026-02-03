@@ -16,36 +16,22 @@ class SoftDeleteController
     public function desativar(): void
     {
         $id     = (int) $_POST['id'];
-        $tipo   = $_POST['tipo'];
-
-        $tabela = match ($tipo) {
-            'admin'   => 'admins',
-            'cliente' => 'clientes',
-            'sindico' => 'sindicos',
-            default   => throw new \Exception('Tipo inválido')
-        };
+        $tabela = $_POST['tabela'];
 
         $this->softDeleteRepo->desativar($tabela, $id);
 
-        header('Location: /');
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit;
     }
 
     public function reativar(): void
     {
         $id     = (int) $_POST['id'];
-        $tipo   = $_POST['tipo'];
-
-        $tabela = match ($tipo) {
-            'admin'   => 'admins',
-            'cliente' => 'clientes',
-            'sindico' => 'sindicos',
-            default   => throw new \Exception('Tipo inválido')
-        };
+        $tabela = $_POST['tabela'];
 
         $this->softDeleteRepo->reativar($tabela, $id);
 
-        header('Location: /');
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
         exit;
     }
 }

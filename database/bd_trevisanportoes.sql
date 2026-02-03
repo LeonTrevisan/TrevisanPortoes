@@ -197,6 +197,11 @@ INSERT INTO tb_endereco (
 (1, 'Rua das Flores', 'Centro', 120, 'São Paulo', 'Casa'),
 (2, 'Av. Brasil', 'Jardins', 1500, 'São Paulo', 'Bloco A');
 
+-- Adicionar coluna deleted_at para soft delete
+ALTER TABLE tb_admin_cond ADD COLUMN deleted_at DATETIME NULL;
+ALTER TABLE tb_sindico ADD COLUMN deleted_at DATETIME NULL;
+ALTER TABLE tb_cliente ADD COLUMN deleted_at DATETIME NULL;
+
 
 
 

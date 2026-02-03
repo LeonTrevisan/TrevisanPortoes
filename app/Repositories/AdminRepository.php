@@ -26,11 +26,10 @@ class AdminRepository
 
     public function findById(int $id): ?array
     {
-        $db = Database::connect();
-        $stmt = $db->prepare("
+        $stmt = $this->db->prepare("
             SELECT * 
             FROM tb_admin_cond 
-            WHERE id = :id
+            WHERE id_admin = :id
         ");
 
         $stmt->bindValue(':id', $id);
@@ -42,15 +41,14 @@ class AdminRepository
      public function atualizarDeletedAt(int $id, ?string $deletedAt): void
     {
         Database::execute(
-            "UPDATE admins SET deleted_at = ? WHERE id = ?",
+            "UPDATE tb_admin_cond SET deleted_at = ? WHERE id_admin = ?",
             [$deletedAt, $id]
         );
     }
 
     public function getAll(): array
     {
-        $db = Database::connect();
-        $stmt = $db->query("
+        $stmt = $this->db->query("
             SELECT * 
             FROM tb_admin_cond 
             ORDER BY nome ASC, deleted_at ASC
@@ -61,15 +59,13 @@ class AdminRepository
 
     public function getAtivos(): array
     {
-        $db = Database::connect();
-        $stmt = $db->query("
+        $stmt = $this->db->query("
             SELECT * 
             FROM tb_admin_cond 
             WHERE deleted_at IS NULL
             ORDER BY nome ASC
         ");
 
-        $stmt->execute();
         return $stmt->fetchAll();
     }
 }

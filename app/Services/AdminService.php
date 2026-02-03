@@ -3,10 +3,11 @@
 namespace App\Services;
 
 use App\Repositories\AdminRepository;
+use App\Repositories\SoftDeleteRepository;
 
 class AdminService
 {
-    public function __construct(private AdminRepository $repository) {}
+    public function __construct(private AdminRepository $repository, private SoftDeleteRepository $softDelete) {}
 
     public function cadastrar(array $dados): void
     {
@@ -22,20 +23,20 @@ class AdminService
     }
 
     public function desativar(int $id): void
-{
-    $admin = $this->repository->buscarPorId($id);
+    {
+        $admin = $this->repository->buscarPorId($id);
 
-    if (!$admin) {
-        throw new \Exception("Admin não encontrado");
+        if (!$admin) {
+            throw new \Exception("Admin não encontrado");
+        }
+
+        $this->softDelete->desativar('tb_admin_cond', $id, 'id_admin');
     }
 
-    $this->statusService->desativar(
-        $admin,
-        fn ($deletedAt) =>
-            $this->repository->atualizarDeletedAt($id, $deletedAt)
-    );
-}
-
+    public function reativar(int $id): void
+    {
+        $this->softDelete->reativar('tb_admin_cond', $id);
+    }
 
     public function listarAtivos(): array
     {
