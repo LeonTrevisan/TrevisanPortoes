@@ -18,20 +18,33 @@ class ServicoController
 
     public function store(): void {
         try {
+            $fotoPath = null;
+            $comprovantePath = null;
+
+            // Processar upload de foto
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                $fotoPath = $this->uploadFile($_FILES['foto'], 'servicos');
+            }
+
+            // Processar upload de comprovante
+            if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
+                $comprovantePath = $this->uploadFile($_FILES['comprovante'], 'servicos');
+            }
+
             $this->service->cadastrar([
                 'id_cliente' => (int)$_POST['id_cliente'],
                 'id_tipo' => (int)$_POST['id_tipo'],
                 'descricao' => $_POST['descricao'] ?? null,
                 'observacao' => $_POST['observacao'] ?? null,
-                'foto' => $_POST['foto'] ?? null,
-                'comprovante' => $_POST['comprovante'] ?? null,
+                'foto' => $fotoPath,
+                'comprovante' => $comprovantePath,
                 'data_hora' => $_POST['data_hora'] ?? date('Y-m-d H:i:s')
             ]);
 
-            header('Location: /?page=servicos&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=servicos&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=servicos&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=servicos&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }
@@ -77,24 +90,54 @@ class ServicoController
     public function update(): void {
         $id = $_POST['id'] ?? null;
         if(!$id) {
-            header('Location: /?page=servicos&status=error&message=ID não fornecido');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=servicos&status=error&message=ID não fornecido');
             exit();
         }
         try {
+            $fotoPath = $_POST['foto_existing'] ?? null;
+            $comprovantePath = $_POST['comprovante_existing'] ?? null;
+
+            // Processar upload de foto
+            if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
+                $fotoPath = $this->uploadFile($_FILES['foto'], 'servicos');
+            }
+
+            // Processar upload de comprovante
+            if (isset($_FILES['comprovante']) && $_FILES['comprovante']['error'] === UPLOAD_ERR_OK) {
+                $comprovantePath = $this->uploadFile($_FILES['comprovante'], 'servicos');
+            }
+
             $this->service->atualizar((int)$id, [
                 'id_cliente' => (int)$_POST['id_cliente'],
                 'id_tipo' => (int)$_POST['id_tipo'],
                 'descricao' => $_POST['descricao'] ?? null,
                 'observacao' => $_POST['observacao'] ?? null,
-                'foto' => $_POST['foto'] ?? null,
-                'comprovante' => $_POST['comprovante'] ?? null,
+                'foto' => $fotoPath,
+                'comprovante' => $comprovantePath,
                 'data_hora' => $_POST['data_hora'] ?? date('Y-m-d H:i:s')
             ]);
-            header('Location: /?page=servicos&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=servicos&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=servicos&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=servicos&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
+    }
+
+    private function uploadFile(array $file, string $subfolder): ?string
+    {
+        $uploadDir = __DIR__ . '/../../public/uploads/' . $subfolder . '/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $fileName = uniqid() . '_' . basename($file['name']);
+        $filePath = $uploadDir . $fileName;
+
+        if (move_uploaded_file($file['tmp_name'], $filePath)) {
+            return 'uploads/' . $subfolder . '/' . $fileName;
+        }
+
+        return null;
     }
 }

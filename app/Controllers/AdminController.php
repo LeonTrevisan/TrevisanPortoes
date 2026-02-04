@@ -27,10 +27,10 @@ class AdminController
                 'email' => $_POST['email'] ?? ''
             ]);
 
-            header('Location: /?page=admin&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=admin&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=admin&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=admin&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }
@@ -65,6 +65,7 @@ class AdminController
     //Index of all admins.
     public function index() {
         $admins = $this->service->listarTodos();
+        $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         require __DIR__ . '/../Views/admin/index.php';
     }
 
@@ -82,7 +83,7 @@ class AdminController
             return;
         }
         // Condomínios do admin
-        $condominios = []; // Implementar
+        $condominios = $this->service->getCondominios((int)$id);
         require __DIR__ . '/../Views/admin/ficha.php';
     }
 }

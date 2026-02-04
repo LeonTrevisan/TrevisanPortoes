@@ -9,13 +9,13 @@
             <button class="btn btn-info" onclick="verFichaCliente(<?= $cliente['id_cliente'] ?>)">Ver Ficha</button>
 
             <?php if ($cliente['deleted_at'] === null): ?>
-                <form method="POST" action="/softDelete/desativar">
+                <form method="POST" action="<?= $baseUrl ?>/softDelete/desativar">
                     <input type="hidden" name="tabela" value="tb_cliente">
                     <input type="hidden" name="id" value="<?= $cliente['id_cliente'] ?>">
                     <button class="btn btn-danger" type="submit">Desativar</button>
                 </form>
             <?php else: ?>
-                <form method="POST" action="/softDelete/reativar">
+                <form method="POST" action="<?= $baseUrl ?>/softDelete/reativar">
                     <input type="hidden" name="tabela" value="tb_cliente">
                     <input type="hidden" name="id" value="<?= $cliente['id_cliente'] ?>">
                     <button class="btn btn-success" type="submit">Reativar</button>

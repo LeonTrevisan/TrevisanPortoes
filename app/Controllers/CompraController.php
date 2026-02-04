@@ -26,10 +26,10 @@ class CompraController
                 'id_distribuidora' => $_POST['id_distribuidora'] ? (int)$_POST['id_distribuidora'] : null
             ]);
 
-            header('Location: /?page=pecas&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=pecas&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=pecas&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=pecas&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }
@@ -59,7 +59,7 @@ class CompraController
     public function update(): void {
         $id = $_POST['id'] ?? null;
         if(!$id) {
-            header('Location: /?page=pecas&status=error&message=ID não fornecido');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=pecas&status=error&message=ID não fornecido');
             exit();
         }
         try {
@@ -70,10 +70,10 @@ class CompraController
                 'valor_un' => (float)$_POST['valor_un'],
                 'id_distribuidora' => $_POST['id_distribuidora'] ? (int)$_POST['id_distribuidora'] : null
             ]);
-            header('Location: /?page=pecas&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=pecas&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=pecas&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=pecas&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }

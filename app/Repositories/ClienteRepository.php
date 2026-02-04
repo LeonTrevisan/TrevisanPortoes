@@ -166,4 +166,18 @@ class ClienteRepository
             [$deletedAt, $id]
         );
     }
+
+    public function getServicos(int $id_cliente): array
+    {
+        $stmt = $this->db->prepare("
+            SELECT s.*, ts.tipo_servico
+            FROM tb_servico s
+            JOIN tb_tipo_servico ts ON s.id_tipo = ts.id_tipo
+            WHERE s.id_cliente = :id_cliente
+            ORDER BY s.data_hora DESC
+        ");
+        $stmt->bindValue(':id_cliente', $id_cliente);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

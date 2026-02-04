@@ -9,13 +9,13 @@
             <button class="btn btn-info" onclick="verFichaAdmin(<?= $admin['id_admin'] ?>)">Ver Ficha</button>
 
             <?php if ($admin['deleted_at'] === null): ?>
-                <form method="POST" action="/softDelete/desativar">
+                <form method="POST" action="<?= $baseUrl ?>/softDelete/desativar">
                     <input type="hidden" name="tabela" value="tb_admin_cond">
                     <input type="hidden" name="id" value="<?= $admin['id_admin'] ?>">
                     <button class="btn btn-danger" type="submit">Desativar</button>
                 </form>
             <?php else: ?>
-                <form method="POST" action="/softDelete/reativar">
+                <form method="POST" action="<?= $baseUrl ?>/softDelete/reativar">
                     <input type="hidden" name="tabela" value="tb_admin_cond">
                     <input type="hidden" name="id" value="<?= $admin['id_admin'] ?>">
                     <button class="btn btn-success" type="submit">Reativar</button>

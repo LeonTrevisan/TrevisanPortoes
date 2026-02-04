@@ -1,13 +1,16 @@
-<div class="ficha-admin">
+<div class="ficha-admin ficha-completa">
+    <button class="btn-close" data-page="admin" onclick="voltarParaDashboard(this)">×</button>
     <h2>Ficha Completa do Administrador</h2>
-    <div class="admin-info">
-        <h3>Informações do Administrador</h3>
+    <div class="admin-info ficha-info">
+        <p>
+            <h3>Informações do Administrador</h3>
+        </p>
         <p><strong>Nome:</strong> <?= htmlspecialchars($admin['nome']) ?></p>
         <p><strong>Telefone:</strong> <?= formatarTelefone($admin['telefone']) ?></p>
         <p><strong>Email:</strong> <?= htmlspecialchars($admin['email']) ?></p>
     </div>
 
-    <div class="condominios-info">
+    <div class="condominios-info info">
         <h3>Condomínios Vinculados</h3>
         <?php if (empty($condominios)): ?>
             <p>Nenhum condomínio vinculado.</p>
@@ -15,8 +18,9 @@
             <ul>
                 <?php foreach ($condominios as $condominio): ?>
                     <li>
+                        <hr>
                         <strong>Nome:</strong> <?= htmlspecialchars($condominio['nome']) ?><br>
-                        <strong>Tipo:</strong> <?= htmlspecialchars($condominio['tipo_cliente']) ?><br>
+                        <strong>Endereço:</strong> <?= htmlspecialchars(formatarEndereco($condominio)) ?><br>
                         <strong>Telefone:</strong> <?= formatarTelefone($condominio['telefone']) ?>
                     </li>
                 <?php endforeach; ?>

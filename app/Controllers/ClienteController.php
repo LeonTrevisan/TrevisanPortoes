@@ -54,10 +54,10 @@ class ClienteController
                 'complemento' => $_POST['complemento'] ?? ''
             ]);
 
-            header('Location: /?page=clientes&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=clientes&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=clientes&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=clientes&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }
@@ -86,6 +86,7 @@ class ClienteController
 
     public function index() {
         $clientes = $this->service->listarTodos();
+        $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         require __DIR__ . '/../Views/clients/index.php';
     }
 
@@ -102,13 +103,14 @@ class ClienteController
             echo 'Cliente não encontrado.';
             return;
         }
+        $servicos = $this->service->getServicos((int)$id);
         require __DIR__ . '/../Views/clients/ficha.php';
     }
 
     public function update(): void {
         $id = $_POST['id'] ?? null;
         if(!$id) {
-            header('Location: /?page=clientes&status=error&message=ID não fornecido');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=clientes&status=error&message=ID não fornecido');
             exit();
         }
         try {
@@ -145,10 +147,10 @@ class ClienteController
                 'cidade' => $_POST['cidade'] ?? '',
                 'complemento' => $_POST['complemento'] ?? ''
             ]);
-            header('Location: /?page=clientes&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=clientes&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=clientes&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=clientes&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }

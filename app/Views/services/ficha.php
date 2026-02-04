@@ -1,10 +1,13 @@
-<div class="ficha-servico">
+<div class="ficha-servico ficha-completa">
+    <button class="btn-close" data-page="servicos" onclick="voltarParaDashboard(this)">×</button>
     <h2>Ficha Completa do Serviço</h2>
-    <div class="servico-info">
-        <h3>Informações do Serviço</h3>
+    <div class="servico-info ficha-info">
+        <p>
+            <h3>Informações do Serviço</h3>
+        </p>
         <p><strong>Cliente:</strong> <?= htmlspecialchars($servico['cliente_nome']) ?></p>
         <p><strong>Tipo:</strong> <?= htmlspecialchars($servico['tipo_servico']) ?></p>
-        <p><strong>Data/Hora:</strong> <?= date('d/m/Y H:i', strtotime($servico['data_hora'])) ?></p>
+        <p><strong>Data:</strong> <?= date('d/m/Y', strtotime($servico['data_hora'])) ?></p>
         <p><strong>Descrição:</strong> <?= htmlspecialchars($servico['descricao'] ?? 'N/A') ?></p>
         <p><strong>Observação:</strong> <?= htmlspecialchars($servico['observacao'] ?? 'N/A') ?></p>
         <?php if ($servico['foto']): ?>

@@ -27,3 +27,15 @@ function formatarTelefone(string $telefone): string
 
     return $telefone; // fallback
 }
+
+function formatarEndereco(array $endereco): string
+{
+    $partes = [];
+    if (!empty($endereco['rua'])) $partes[] = $endereco['rua'];
+    if (!empty($endereco['numero'])) $partes[] = $endereco['numero'];
+    if (!empty($endereco['bairro'])) $partes[] = $endereco['bairro'];
+    if (!empty($endereco['cidade'])) $partes[] = $endereco['cidade'];
+    if (!empty($endereco['complemento'])) $partes[] = $endereco['complemento'];
+
+    return implode(', ', $partes);
+}

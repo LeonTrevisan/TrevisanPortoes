@@ -1,7 +1,10 @@
-<div class="ficha-cliente">
+<div class="ficha-cliente ficha-completa">
+    <button class="btn-close" data-page="clientes" onclick="voltarParaDashboard(this)">×</button>
     <h2>Ficha Completa do Cliente</h2>
-    <div class="cliente-info">
-        <h3>Informações do Cliente</h3>
+    <div class="cliente-info ficha-info">
+        <p>
+            <h3>Informações do Cliente</h3>
+        </p>
         <p><strong>Nome:</strong> <?= htmlspecialchars($cliente['nome']) ?></p>
         <p><strong>Tipo:</strong> <?= htmlspecialchars($cliente['tipo_cliente']) ?></p>
         <p><strong>Telefone:</strong> <?= formatarTelefone($cliente['telefone']) ?></p>
@@ -42,7 +45,7 @@
     </div>
     <?php endif; ?>
 
-    <div class="servicos-info">
+    <div class="servicos-info info">
         <h3>Serviços Prestados</h3>
         <?php if (empty($servicos)): ?>
             <p>Nenhum serviço registrado.</p>
@@ -50,6 +53,7 @@
             <ul>
                 <?php foreach ($servicos as $servico): ?>
                     <li>
+                        <hr>
                         <strong>Data:</strong> <?= htmlspecialchars($servico['data_hora']) ?><br>
                         <strong>Tipo:</strong> <?= htmlspecialchars($servico['tipo_servico']) ?><br>
                         <strong>Descrição:</strong> <?= htmlspecialchars($servico['descricao'] ?? 'N/A') ?>

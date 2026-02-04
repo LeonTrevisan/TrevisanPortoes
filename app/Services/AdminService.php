@@ -52,4 +52,9 @@ class AdminService
     {
         return $this->repository->findById($id);
     }
+
+    public function getCondominios(int $id): array
+    {
+        return $this->repository->getCondominios($id);
+    }
 }

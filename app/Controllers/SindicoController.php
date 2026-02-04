@@ -25,16 +25,16 @@ class SindicoController
                 'telefone' => $_POST['telefone'] ?? ''
             ]);
 
-            header('Location: /?page=sindico&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=success');
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=sindico&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }
 
     public function obter() {
-        $id = $_GET['id'] ?? null;
+        $id = $_POST['id'];
         if(!$id) {
             http_response_code(400);
             echo json_encode(['error' => 'ID do síndico não fornecido.']);
@@ -57,11 +57,12 @@ class SindicoController
 
     public function index() {
         $sindicos = $this->service->listarTodos();
+        $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
         require __DIR__ . '/../Views/sindico/index.php';
     }
 
     public function ficha() {
-        $id = $_GET['id'] ?? null;
+        $id = $_GET['id'] ?? $_POST['id'] ?? null;
         if(!$id) {
             http_response_code(400);
             echo 'ID não fornecido.';
@@ -78,9 +79,9 @@ class SindicoController
     }
 
     public function update(): void {
-        $id = $_POST['id'] ?? null;
+        $id = $_POST['id'];
         if(!$id) {
-            header('Location: /?page=sindico&status=error&message=ID não fornecido');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=error&message=ID não fornecido');
             exit();
         }
         try {
@@ -88,10 +89,10 @@ class SindicoController
                 'nome' => $_POST['nome'] ?? '',
                 'telefone' => $_POST['telefone'] ?? ''
             ]);
-            header('Location: /?page=sindico&status=success');
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=success&message=ID ' . $id);
             exit();
         } catch(\Throwable $e) {
-            header('Location: /?page=sindico&status=error&message=' . urlencode($e->getMessage()));
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=error&message=' . urlencode($e->getMessage()));
             exit();
         }
     }

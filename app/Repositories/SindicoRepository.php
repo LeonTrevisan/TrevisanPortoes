@@ -54,9 +54,10 @@ class SindicoRepository
     public function getCondominios(int $id_sindico): array
     {
         $stmt = $this->db->prepare("
-            SELECT c.*, tc.tipo_cliente
+            SELECT c.*, tc.tipo_cliente, e.rua, e.numero, e.bairro, e.cidade, e.complemento
             FROM tb_cliente c
             JOIN tb_tipo_cliente tc ON c.id_tipo_cliente = tc.id_tipo_cliente
+            LEFT JOIN tb_endereco e ON c.id_cliente = e.id_cliente
             WHERE c.id_sindico = :id_sindico AND c.deleted_at IS NULL
         ");
         $stmt->bindValue(':id_sindico', $id_sindico);

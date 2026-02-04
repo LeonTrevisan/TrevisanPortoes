@@ -2,7 +2,7 @@
 <tr>
     <td><?= $servico['cliente_nome'] ?></td>
     <td><?= $servico['tipo_servico'] ?></td>
-    <td><?= date('d/m/Y H:i', strtotime($servico['data_hora'])) ?></td>
+    <td><?= date('d/m/Y', strtotime($servico['data_hora'])) ?></td>
     <td>
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="editarServico(<?= $servico['id_servico'] ?>)">Editar</button>

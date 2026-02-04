@@ -54,8 +54,6 @@ class ClienteService
 
     public function getServicos(int $id): array
     {
-        // Assumindo que há um método no repositório
-        // Por enquanto, retornar vazio
-        return [];
+        return $this->repository->getServicos($id);
     }
 }
