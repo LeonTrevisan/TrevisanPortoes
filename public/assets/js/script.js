@@ -127,7 +127,7 @@ function editarSindico(id) {
             document.getElementById('id_sindico').value = data.id_sindico;
             document.getElementById('nome_sindico').value = data.nome;
             document.getElementById('telefone_sindico').value = data.telefone;
-            document.getElementById('tituloModalSindico').textContent = 'Editar Síndico';
+            document.getElementById('tituloModalSindico').textContent = 'Editar Síndico' + id;
             document.getElementById('btnSalvarSindico').textContent = 'Atualizar';
             document.getElementById('formSindico').action = baseUrl + '/sindico/update';
             openModal('modalSindico');
