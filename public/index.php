@@ -11,6 +11,7 @@
     $db = Database::connect();
 
     $adminController = new AdminController();
+    $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 
 ?>
 <!DOCTYPE html>
@@ -20,6 +21,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trevisan Portões Automáticos</title>
     <link rel="stylesheet" href="assets/css/style.css">
+    <script>
+        const baseUrl = '<?= $baseUrl ?>';
+    </script>
     <script src="assets/js/script.js" defer></script>
 </head>
 <body>
@@ -29,12 +33,12 @@
 
     <div class="container">
         <div class="sidebar">
-            <div class="menu-item active" onclick="showPage('dashboard', this)">Dashboard</div>
-            <div class="menu-item" onclick="showPage('clientes', this)">Clientes</div>
-            <div class="menu-item" onclick="showPage('admin', this)">Adminsitradores</div>
-            <div class="menu-item" onclick="showPage('sindico', this)">Síndicos</div>
-            <div class="menu-item" onclick="showPage('servicos', this)">Serviços</div>
-            <div class="menu-item" onclick="showPage('pecas', this)">Peças e Materiais</div>
+            <div class="menu-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
+            <div class="menu-item" data-page="clientes" onclick="showPage('clientes', this)">Clientes</div>
+            <div class="menu-item" data-page="admin" onclick="showPage('admin', this)">Adminsitradores</div>
+            <div class="menu-item" data-page="sindico" onclick="showPage('sindico', this)">Síndicos</div>
+            <div class="menu-item" data-page="servicos" onclick="showPage('servicos', this)">Serviços</div>
+            <div class="menu-item" data-page="pecas" onclick="showPage('pecas', this)">Peças e Materiais</div>
         </div>
 
         <div class="main-content">
@@ -209,7 +213,7 @@
                             <tr>
                                 <th>Cliente</th>
                                 <th>Tipo</th>
-                                <th>Data/Hora</th>
+                                <th>Data</th>
                                 <th>Ações</th>
                             </tr>
                         </thead>
@@ -269,7 +273,7 @@
             <div class="modal-header">
                 <h3 id="tituloModalAdm">Novo Administrador</h3>
             </div>
-            <form id="formAdm" action="/admin/store" method="POST">
+            <form id="formAdm" action="<?= $baseUrl ?>/admin/store" method="POST">
                 <input type="hidden" name="id" id="id_admin">
                 <div class="form-group">
                     <label for="nome_admin">Nome:</label>
@@ -297,7 +301,7 @@
             <div class="modal-header">
                 <h3 id="tituloModalCliente">Novo Cliente</h3>
             </div>
-            <form id="formCliente" action="/clientes/store" method="POST" enctype="multipart/form-data">
+            <form id="formCliente" action="<?= $baseUrl ?>/clientes/store" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="id_cliente">
                 <div class="form-group">
                     <label for="nome_cliente">Nome:</label>
@@ -376,7 +380,7 @@
             <div class="modal-header">
                 <h3 id="tituloModalSindico">Novo Síndico</h3>
             </div>
-            <form id="formSindico" action="/sindico/store" method="POST">
+            <form id="formSindico" action="<?= $baseUrl ?>/sindico/store" method="POST">
                 <input type="hidden" name="id" id="id_sindico">
                 <div class="form-group">
                     <label for="nome_sindico">Nome:</label>
@@ -400,7 +404,7 @@
             <div class="modal-header">
                 <h3 id="tituloModalServico">Novo Serviço</h3>
             </div>
-            <form id="formServico" action="/servicos/store" method="POST">
+            <form id="formServico" action="<?= $baseUrl ?>/servicos/store" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="id_servico">
                 <div class="form-group">
                     <label for="id_cliente_servico">Cliente:</label>
@@ -421,8 +425,8 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="data_hora_servico">Data/Hora:</label>
-                    <input type="datetime-local" id="data_hora_servico" name="data_hora" required>
+                    <label for="data_hora_servico">Data:</label>
+                    <input type="date" id="data_hora_servico" name="data_hora" required>
                 </div>
                 <div class="form-group">
                     <label for="descricao_servico">Descrição:</label>
@@ -433,12 +437,16 @@
                     <textarea id="observacao_servico" name="observacao"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="foto_servico">Foto (URL):</label>
-                    <input type="url" id="foto_servico" name="foto">
+                    <label for="foto_servico">Foto:</label>
+                    <input type="file" id="foto_servico" name="foto" accept="image/*">
+                    <input type="hidden" id="foto_existing" name="foto_existing">
+                    <div id="foto_current"></div>
                 </div>
                 <div class="form-group">
-                    <label for="comprovante_servico">Comprovante (URL):</label>
-                    <input type="url" id="comprovante_servico" name="comprovante">
+                    <label for="comprovante_servico">Comprovante:</label>
+                    <input type="file" id="comprovante_servico" name="comprovante" accept="image/*,.pdf">
+                    <input type="hidden" id="comprovante_existing" name="comprovante_existing">
+                    <div id="comprovante_current"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modalServico')">Cancelar</button>
@@ -454,7 +462,7 @@
             <div class="modal-header">
                 <h3 id="tituloModalCompra">Nova Compra</h3>
             </div>
-            <form id="formCompra" action="/compras/store" method="POST">
+            <form id="formCompra" action="<?= $baseUrl ?>/compras/store" method="POST">
                 <input type="hidden" name="id" id="id_compra">
                 <div class="form-group">
                     <label for="data_compra">Data:</label>
@@ -489,6 +497,18 @@
             </form>
         </div>
     </div>
+
+    <script>
+        // Verificar se há parâmetro page na URL e navegar
+        const urlParams = new URLSearchParams(window.location.search);
+        const page = urlParams.get('page');
+        if (page) {
+            const menuItem = document.querySelector(`.menu-item[data-page="${page}"]`);
+            if (menuItem) {
+                showPage(page, menuItem);
+            }
+        }
+    </script>
 
 </body>
 </html>

@@ -41,12 +41,15 @@ $router = [
         '/clientes/update' => [ClienteController::class, 'update'],
         '/sindico/store' => [SindicoController::class, 'store'],
         '/sindico/update' => [SindicoController::class, 'update'],
+        '/sindico/obter' => [SindicoController::class, 'obter'],
+        '/sindico/ficha' => [SindicoController::class, 'ficha'],
         '/servicos/store' => [ServicoController::class, 'store'],
         '/servicos/update' => [ServicoController::class, 'update'],
         '/compras/store' => [CompraController::class, 'store'],
         '/compras/update' => [CompraController::class, 'update'],
         '/softDelete/ativar' => [SoftDeleteController::class, 'ativar'],
         '/softDelete/desativar' => [SoftDeleteController::class, 'desativar'],
+        '/softDelete/reativar' => [SoftDeleteController::class, 'reativar'],
     ],
 ];
 

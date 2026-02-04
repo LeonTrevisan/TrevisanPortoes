@@ -13,10 +13,15 @@ function showPage(pageId, element) {
     loadPageContent(pageId);
 }
 
+function voltarParaDashboard(button) {
+    const page = button.dataset.page;
+    window.location.href = baseUrl + '/?page=' + page;
+}
+
 function loadPageContent(pageId) {
     const pageDiv = document.getElementById(pageId);
     if (pageId === 'clientes' && pageDiv.innerHTML.trim() === '') {
-        fetch('/clientes')
+        fetch(baseUrl + '/clientes')
             .then(response => response.text())
             .then(html => {
                 pageDiv.innerHTML = `
@@ -73,7 +78,7 @@ function toggleCondominioFields() {
 
 // Funções de edição
 function editarAdmin(id) {
-    fetch('/admin/obter?id=' + id)
+    fetch(baseUrl + '/admin/obter?id=' + id)
         .then(r => r.json())
         .then(data => {
             document.getElementById('id_admin').value = data.id_admin;
@@ -82,13 +87,13 @@ function editarAdmin(id) {
             document.getElementById('email_admin').value = data.email;
             document.getElementById('tituloModalAdm').textContent = 'Editar Administrador';
             document.getElementById('btnSalvarAdm').textContent = 'Atualizar';
-            document.getElementById('formAdm').action = '/admin/update';
+            document.getElementById('formAdm').action = baseUrl + '/admin/update';
             openModal('modalAdm');
         });
 }
 
 function editarCliente(id) {
-    fetch('/clientes/obter?id=' + id)
+    fetch(baseUrl + '/clientes/obter?id=' + id)
         .then(r => r.json())
         .then(data => {
             document.getElementById('id_cliente').value = data.id_cliente;
@@ -106,14 +111,17 @@ function editarCliente(id) {
             document.getElementById('complemento_cliente').value = data.complemento || '';
             document.getElementById('tituloModalCliente').textContent = 'Editar Cliente';
             document.getElementById('btnSalvarCliente').textContent = 'Atualizar';
-            document.getElementById('formCliente').action = '/clientes/update';
+            document.getElementById('formCliente').action = baseUrl + '/clientes/update';
             toggleCondominioFields();
             openModal('modalCliente');
         });
 }
 
 function editarSindico(id) {
-    fetch('/sindico/obter?id=' + id)
+    fetch(baseUrl + '/sindico/obter', {
+        method: 'POST',
+        body: new URLSearchParams({id: id})
+    })
         .then(r => r.json())
         .then(data => {
             document.getElementById('id_sindico').value = data.id_sindico;
@@ -121,13 +129,13 @@ function editarSindico(id) {
             document.getElementById('telefone_sindico').value = data.telefone;
             document.getElementById('tituloModalSindico').textContent = 'Editar Síndico';
             document.getElementById('btnSalvarSindico').textContent = 'Atualizar';
-            document.getElementById('formSindico').action = '/sindico/update';
+            document.getElementById('formSindico').action = baseUrl + '/sindico/update';
             openModal('modalSindico');
         });
 }
 
 function editarServico(id) {
-    fetch('/servicos/obter?id=' + id)
+    fetch(baseUrl + '/servicos/obter?id=' + id)
         .then(r => r.json())
         .then(data => {
             document.getElementById('id_servico').value = data.id_servico;
@@ -136,17 +144,19 @@ function editarServico(id) {
             document.getElementById('data_hora_servico').value = data.data_hora.replace(' ', 'T');
             document.getElementById('descricao_servico').value = data.descricao || '';
             document.getElementById('observacao_servico').value = data.observacao || '';
-            document.getElementById('foto_servico').value = data.foto || '';
-            document.getElementById('comprovante_servico').value = data.comprovante || '';
+            document.getElementById('foto_existing').value = data.foto || '';
+            document.getElementById('comprovante_existing').value = data.comprovante || '';
+            document.getElementById('foto_current').innerHTML = data.foto ? '<a href="' + baseUrl + '/' + data.foto + '" target="_blank">Ver Foto Atual</a>' : '';
+            document.getElementById('comprovante_current').innerHTML = data.comprovante ? '<a href="' + baseUrl + '/' + data.comprovante + '" target="_blank">Ver Comprovante Atual</a>' : '';
             document.getElementById('tituloModalServico').textContent = 'Editar Serviço';
             document.getElementById('btnSalvarServico').textContent = 'Atualizar';
-            document.getElementById('formServico').action = '/servicos/update';
+            document.getElementById('formServico').action = baseUrl + '/servicos/update';
             openModal('modalServico');
         });
 }
 
 function editarCompra(id) {
-    fetch('/compras/obter?id=' + id)
+    fetch(baseUrl + '/compras/obter?id=' + id)
         .then(r => r.json())
         .then(data => {
             document.getElementById('id_compra').value = data.id_compra;
@@ -157,14 +167,14 @@ function editarCompra(id) {
             document.getElementById('id_distribuidora').value = data.id_distribuidora || '';
             document.getElementById('tituloModalCompra').textContent = 'Editar Compra';
             document.getElementById('btnSalvarCompra').textContent = 'Atualizar';
-            document.getElementById('formCompra').action = '/compras/update';
+            document.getElementById('formCompra').action = baseUrl + '/compras/update';
             openModal('modalCompra');
         });
 }
 
 // Funções de ver ficha
 function verFichaCliente(id) {
-    fetch('/clientes/ficha?id=' + id)
+    fetch(baseUrl + '/clientes/ficha?id=' + id)
         .then(r => r.text())
         .then(html => {
             document.querySelector('.main-content').innerHTML = html;
@@ -172,7 +182,10 @@ function verFichaCliente(id) {
 }
 
 function verFichaSindico(id) {
-    fetch('/sindico/ficha?id=' + id)
+    fetch(baseUrl + '/sindico/ficha', {
+        method: 'POST',
+        body: new URLSearchParams({id: id})
+    })
         .then(r => r.text())
         .then(html => {
             document.querySelector('.main-content').innerHTML = html;
@@ -180,7 +193,7 @@ function verFichaSindico(id) {
 }
 
 function verFichaServico(id) {
-    fetch('/servicos/ficha?id=' + id)
+    fetch(baseUrl + '/servicos/ficha?id=' + id)
         .then(r => r.text())
         .then(html => {
             document.querySelector('.main-content').innerHTML = html;
@@ -188,7 +201,7 @@ function verFichaServico(id) {
 }
 
 function verFichaAdmin(id) {
-    fetch('/admin/ficha?id=' + id)
+    fetch(baseUrl + '/admin/ficha?id=' + id)
         .then(r => r.text())
         .then(html => {
             document.querySelector('.main-content').innerHTML = html;
@@ -196,7 +209,7 @@ function verFichaAdmin(id) {
 }
 
 function verFichaCompra(id) {
-    fetch('/compras/obter?id=' + id)
+    fetch(baseUrl + '/compras/obter?id=' + id)
         .then(r => r.json())
         .then(data => {
             alert('Compra: ' + data.material + ' - Valor: R$ ' + data.valor_total);
