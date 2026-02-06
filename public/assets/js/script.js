@@ -512,8 +512,29 @@ function applyServicoFilterFromUrl() {
     applyServicoFilters();
 }
 
+function getClienteSearchStatusElement(select) {
+    if (!select) {
+        return null;
+    }
+    const statusId = select.dataset ? select.dataset.searchStatus : '';
+    if (statusId) {
+        const byId = document.getElementById(statusId);
+        if (byId) {
+            return byId;
+        }
+    }
+    const parent = select.parentElement;
+    if (parent) {
+        const scoped = parent.querySelector('.select-search-status');
+        if (scoped) {
+            return scoped;
+        }
+    }
+    return document.getElementById('cliente_search_status');
+}
+
 function updateClienteSearchStatus(select) {
-    const status = document.getElementById('cliente_search_status');
+    const status = getClienteSearchStatusElement(select);
     if (!status) {
         return;
     }
@@ -529,6 +550,7 @@ function filterClienteSelect(select, term) {
     if (!select) {
         return;
     }
+    const previousValue = select.value;
     const options = Array.from(select.options);
     const normalized = normalizeSearchText(term);
 
@@ -547,6 +569,9 @@ function filterClienteSelect(select, term) {
     if (selected && selected.hidden) {
         select.value = '';
     }
+    if (select.value !== previousValue) {
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+    }
     updateClienteSearchStatus(select);
 }
 
@@ -559,37 +584,39 @@ function resetClienteSelectFilter(select) {
 }
 
 function setupClienteSelectSearch() {
-    const select = document.getElementById('id_cliente_servico');
-    if (!select) {
+    const selects = Array.from(document.querySelectorAll('select[data-searchable="1"]'));
+    if (!selects.length) {
         return;
     }
 
-    resetClienteSelectFilter(select);
-
-    select.addEventListener('keydown', function(event) {
-        const key = event.key;
-        if (key === 'Backspace') {
-            const term = (select.dataset.searchTerm || '').slice(0, -1);
-            select.dataset.searchTerm = term;
-            filterClienteSelect(select, term);
-            event.preventDefault();
-            return;
-        }
-        if (key === 'Escape' || key === 'Delete') {
-            resetClienteSelectFilter(select);
-            event.preventDefault();
-            return;
-        }
-        if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
-            const term = (select.dataset.searchTerm || '') + key;
-            select.dataset.searchTerm = term;
-            filterClienteSelect(select, term);
-            event.preventDefault();
-        }
-    });
-
-    select.addEventListener('blur', function() {
+    selects.forEach(select => {
         resetClienteSelectFilter(select);
+
+        select.addEventListener('keydown', function(event) {
+            const key = event.key;
+            if (key === 'Backspace') {
+                const term = (select.dataset.searchTerm || '').slice(0, -1);
+                select.dataset.searchTerm = term;
+                filterClienteSelect(select, term);
+                event.preventDefault();
+                return;
+            }
+            if (key === 'Escape' || key === 'Delete') {
+                resetClienteSelectFilter(select);
+                event.preventDefault();
+                return;
+            }
+            if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+                const term = (select.dataset.searchTerm || '') + key;
+                select.dataset.searchTerm = term;
+                filterClienteSelect(select, term);
+                event.preventDefault();
+            }
+        });
+
+        select.addEventListener('blur', function() {
+            resetClienteSelectFilter(select);
+        });
     });
 }
 

@@ -435,7 +435,8 @@
                 <div id="ficha-cliente-wrapper" class="card ficha-cliente-card">
                     <div class="form-group">
                         <label for="ficha_cliente_select">Cliente:</label>
-                        <select id="ficha_cliente_select" name="ficha_cliente_select">
+                        <select id="ficha_cliente_select" name="ficha_cliente_select" data-searchable="1" data-search-status="ficha_cliente_search_status" size="6">
+                            <div id="ficha_cliente_search_status" class="select-search-status">Digite para filtrar</div>
                             <option value="">Selecione</option>
                             <?php
                             $fichaClienteController = new App\Controllers\ClienteController();
@@ -650,7 +651,7 @@
                 <input type="hidden" name="id" id="id_servico">
                 <div class="form-group">
                     <label for="id_cliente_servico">Cliente:</label>
-                    <select id="id_cliente_servico" name="id_cliente" required size="6" data-searchable="1">
+                    <select id="id_cliente_servico" name="id_cliente" required size="6" data-searchable="1" data-search-status="cliente_search_status">
                         <div id="cliente_search_status" class="select-search-status">Digite para filtrar</div>
                         <option value="">Selecione</option>
                         <?php
