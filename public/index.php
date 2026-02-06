@@ -122,6 +122,7 @@
             <div class="menu-item" data-page="sindico" onclick="showPage('sindico', this)">Síndicos</div>
             <div class="menu-item" data-page="servicos" onclick="showPage('servicos', this)">Serviços</div>
             <div class="menu-item" data-page="pecas" onclick="showPage('pecas', this)">Peças e Materiais</div>
+            <div class="menu-item" data-page="fichas" onclick="showPage('fichas', this)">Fichas</div>
         </div>
 
         <div class="main-content">
@@ -409,6 +410,101 @@
                 </div>
             </div>
 
+            <!-- Fichas -->
+            <div id="fichas" class="page">
+                <div class="page-header">
+                    <h2>Fichas</h2>
+                    <p>Impressao de fichas para preenchimento manual</p>
+                </div>
+
+                <div class="ficha-controls">
+                    <div class="ficha-type-group">
+                        <span class="ficha-type-label">Tipo de ficha:</span>
+                        <label class="ficha-type-option">
+                            <input type="radio" name="ficha_tipo" value="generica" checked>
+                            Ficha generica
+                        </label>
+                        <label class="ficha-type-option">
+                            <input type="radio" name="ficha_tipo" value="especifica">
+                            Ficha com cliente
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="button" onclick="imprimirFicha()">Imprimir ficha</button>
+                </div>
+
+                <div id="ficha-cliente-wrapper" class="card ficha-cliente-card">
+                    <div class="form-group">
+                        <label for="ficha_cliente_select">Cliente:</label>
+                        <select id="ficha_cliente_select" name="ficha_cliente_select">
+                            <option value="">Selecione</option>
+                            <?php
+                            $fichaClienteController = new App\Controllers\ClienteController();
+                            $fichaClienteController->select();
+                            ?>
+                        </select>
+                    </div>
+                    <p class="ficha-note">O endereco sera preenchido automaticamente na ficha.</p>
+                </div>
+
+                <div class="ficha-print-area">
+                    <div id="ficha-generica" class="ficha-sheet active">
+                        <div class="ficha-header">
+                            <div class="ficha-title">Ficha de Servico</div>
+                            <div class="ficha-subtitle">Preenchimento manual</div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Nome do cliente:</span>
+                            <div class="ficha-line"></div>
+                        </div>
+                        <div class="ficha-field ficha-field-stack">
+                            <span class="ficha-label">Endereco do cliente:</span>
+                            <div class="ficha-lines ficha-lines-medium"></div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Data:</span>
+                            <div class="ficha-line ficha-line-short"></div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Tipo do servico:</span>
+                            <div class="ficha-line"></div>
+                        </div>
+                        <div class="ficha-field ficha-field-stack">
+                            <span class="ficha-label">Descricao:</span>
+                            <div class="ficha-lines ficha-lines-large"></div>
+                        </div>
+                    </div>
+
+                    <div id="ficha-especifica" class="ficha-sheet">
+                        <div class="ficha-header">
+                            <div class="ficha-title">Ficha de Servico</div>
+                            <div class="ficha-subtitle">Cliente selecionado</div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Nome do cliente:</span>
+                            <div class="ficha-line"><span class="ficha-value" id="ficha_cliente_nome"></span></div>
+                        </div>
+                        <div class="ficha-field ficha-field-stack">
+                            <span class="ficha-label">Endereco do cliente:</span>
+                            <div class="ficha-lines ficha-lines-medium">
+                                <span class="ficha-value" id="ficha_cliente_endereco"></span>
+                            </div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Data:</span>
+                            <div class="ficha-line ficha-line-short"></div>
+                        </div>
+                        <div class="ficha-field">
+                            <span class="ficha-label">Tipo do servico:</span>
+                            <div class="ficha-line"></div>
+                        </div>
+                        <div class="ficha-field ficha-field-stack">
+                            <span class="ficha-label">Descricao:</span>
+                            <div class="ficha-lines ficha-lines-large"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -688,3 +784,5 @@
 
 </body>
 </html>
+
+

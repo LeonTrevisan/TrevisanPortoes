@@ -49,6 +49,106 @@ function loadPageContent(pageId) {
     // Adicionar para outras páginas se necessário
 }
 
+const fichaClienteCache = {};
+
+function formatEnderecoCliente(cliente) {
+    if (!cliente) {
+        return '';
+    }
+    const ruaNumero = [cliente.rua, cliente.numero].filter(Boolean).join(', ');
+    const partes = [];
+    if (ruaNumero) {
+        partes.push(ruaNumero);
+    }
+    if (cliente.bairro) {
+        partes.push(cliente.bairro);
+    }
+    if (cliente.cidade) {
+        partes.push(cliente.cidade);
+    }
+    if (cliente.complemento) {
+        partes.push(cliente.complemento);
+    }
+    return partes.join(' - ');
+}
+
+function preencherFichaCliente(cliente) {
+    const nomeEl = document.getElementById('ficha_cliente_nome');
+    const enderecoEl = document.getElementById('ficha_cliente_endereco');
+    if (nomeEl) {
+        nomeEl.textContent = cliente ? (cliente.nome || '') : '';
+    }
+    if (enderecoEl) {
+        enderecoEl.textContent = cliente ? formatEnderecoCliente(cliente) : '';
+    }
+}
+
+function carregarClienteFicha(id) {
+    if (!id) {
+        preencherFichaCliente(null);
+        return;
+    }
+    if (fichaClienteCache[id]) {
+        preencherFichaCliente(fichaClienteCache[id]);
+        return;
+    }
+    fetch(baseUrl + '/clientes/obter?id=' + encodeURIComponent(id))
+        .then(response => response.ok ? response.json() : Promise.reject(response))
+        .then(data => {
+            fichaClienteCache[id] = data;
+            preencherFichaCliente(data);
+        })
+        .catch(() => {
+            preencherFichaCliente(null);
+        });
+}
+
+function setFichaTipo(tipo) {
+    const generica = document.getElementById('ficha-generica');
+    const especifica = document.getElementById('ficha-especifica');
+    const wrapper = document.getElementById('ficha-cliente-wrapper');
+    const isEspecifica = tipo === 'especifica';
+
+    if (generica) {
+        generica.classList.toggle('active', !isEspecifica);
+    }
+    if (especifica) {
+        especifica.classList.toggle('active', isEspecifica);
+    }
+    if (wrapper) {
+        wrapper.style.display = isEspecifica ? 'block' : 'none';
+    }
+}
+
+function setupFichaPage() {
+    const radios = document.querySelectorAll('input[name="ficha_tipo"]');
+    if (!radios.length) {
+        return;
+    }
+    const checked = document.querySelector('input[name="ficha_tipo"]:checked');
+    setFichaTipo(checked ? checked.value : 'generica');
+
+    radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            setFichaTipo(radio.value);
+        });
+    });
+
+    const select = document.getElementById('ficha_cliente_select');
+    if (select) {
+        select.addEventListener('change', function() {
+            carregarClienteFicha(select.value);
+        });
+        if (select.value) {
+            carregarClienteFicha(select.value);
+        }
+    }
+}
+
+function imprimirFicha() {
+    window.print();
+}
+
 // Funções de modal
 function openModal(modalId) {
     const modal = document.getElementById(modalId);
@@ -952,6 +1052,7 @@ function filtrarServicos() {
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
     setupClienteSelectSearch();
+    setupFichaPage();
     setupSearchInput('search_admin', 'adminTable', [0, 1]);
     setupSearchInput('search_cliente', 'clienteTable', [0, 2]);
     setupSearchInput('search_sindico', 'sindicoTable', [0, 1]);
@@ -1096,3 +1197,4 @@ window.addEventListener('DOMContentLoaded', function() {
         window.history.replaceState({}, document.title, cleanUrl);
     }
 });
+
