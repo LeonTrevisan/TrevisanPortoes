@@ -39,10 +39,12 @@ class ServicoRepository
     public function getAll(): array
     {
         $stmt = $this->db->query("
-            SELECT s.*, c.nome as cliente_nome, ts.tipo_servico
+            SELECT s.*, c.nome as cliente_nome, ts.tipo_servico, sp.status_pagamento
             FROM tb_servico s
             JOIN tb_cliente c ON s.id_cliente = c.id_cliente
             JOIN tb_tipo_servico ts ON s.id_tipo = ts.id_tipo
+            LEFT JOIN tb_pagamento p ON p.id_servico = s.id_servico
+            LEFT JOIN tb_status_pagamento sp ON p.id_status = sp.id_status
             ORDER BY s.data_hora DESC
         ");
         return $stmt->fetchAll();

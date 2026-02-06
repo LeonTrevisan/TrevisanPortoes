@@ -14,7 +14,6 @@
     $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 
     $dashboard = [
-        'clientes_ativos' => 0,
         'servicos_mes' => 0,
         'compras_mes' => 0.0,
         'pagamentos_pendentes' => 0
@@ -22,6 +21,7 @@
     $ultimosServicos = [];
     $statusPagamentos = [];
     $formasPagamento = [];
+    $tiposServico = [];
 
     $meses = [
         '01' => 'Janeiro',
@@ -48,9 +48,6 @@
     };
 
     try {
-        $dashboard['clientes_ativos'] = (int)$fetchScalar(
-            "SELECT COUNT(*) FROM tb_cliente WHERE deleted_at IS NULL"
-        );
         $dashboard['servicos_mes'] = (int)$fetchScalar(
             "SELECT COUNT(*) FROM tb_servico WHERE data_hora >= :inicio AND data_hora < :fim",
             [':inicio' => $mesInicio, ':fim' => $mesFim]
@@ -89,6 +86,12 @@
             SELECT id_forma_pagamento, forma_pagamento
             FROM tb_forma_pagamento
             ORDER BY id_forma_pagamento ASC
+        ")->fetchAll();
+
+        $tiposServico = $db->query("
+            SELECT id_tipo, tipo_servico
+            FROM tb_tipo_servico
+            ORDER BY tipo_servico ASC
         ")->fetchAll();
     } catch (\Throwable $e) {
     }
@@ -130,25 +133,20 @@
                 </div>
 
                 <div class="stats-grid">
-                    <div class="stat-card">
-                        <h3>Clientes Ativos</h3>
-                        <div class="value"><?= $dashboard['clientes_ativos'] ?></div>
-                    </div>
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="irParaServicos30Dias()">
                         <h3>Serviços no Mês (<?= $mesAtualLabel ?>)</h3>
                         <div class="value"><?= $dashboard['servicos_mes'] ?></div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="irParaCompras30Dias()">
                         <h3>Compras do Mês (<?= $mesAtualLabel ?>)</h3>
                         <div class="value">R$ <?= number_format($dashboard['compras_mes'], 2, ',', '.') ?></div>
                     </div>
-                    <div class="stat-card">
+                    <div class="stat-card clickable" onclick="irParaPendentes()">
                         <h3>Pagamentos Pendentes</h3>
                         <div class="value"><?= $dashboard['pagamentos_pendentes'] ?></div>
                     </div>
                 </div>
 
-                <div class="card">
                     <h3 style="margin-bottom: 1rem;">Últimos Serviços</h3>
                     <table>
                         <thead>
@@ -186,7 +184,6 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
 
  <!-- Adminsitradores -->
             <div id="admin" class="page">
@@ -199,7 +196,7 @@
                 <button class="btn btn-primary" onclick="novoAdmin()">Novo Administrador</button>
                 </div>
 
-                <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
+                <input type="text" id="search_admin" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
 
                 <div class="clients">
                     <table>
@@ -229,7 +226,7 @@
                 <button class="btn btn-primary" onclick="novoCliente()">Novo Cliente</button>
                 </div>
 
-                <input type="text" class="search-bar" placeholder="Buscar por nome ou telefone">
+                <input type="text" id="search_cliente" class="search-bar" placeholder="Buscar por nome ou telefone">
 
                 <div class="clients">
                     <table>
@@ -262,7 +259,7 @@
                 <button class="btn btn-primary" onclick="novoSindico()">Novo Síndico</button>
                 </div>
 
-                <input type="text" class="search-bar" placeholder="Buscar por nome ou telefone">
+                <input type="text" id="search_sindico" class="search-bar" placeholder="Buscar por nome ou telefone">
 
                 <div class="clients">
                     <table>
@@ -294,7 +291,50 @@
                 <button class="btn btn-primary" onclick="novoServico()">Novo Serviço</button>
                 </div>
 
-                <input type="text" class="search-bar" placeholder="Buscar por cliente ou tipo">
+                <input type="text" id="search_servico" class="search-bar" placeholder="Buscar por cliente">
+
+                <div class="filters">
+                    <div class="form-group">
+                        <label for="servico_tipo_filter">Tipo de Serviço:</label>
+                        <select id="servico_tipo_filter">
+                            <option value="">Todos</option>
+                            <?php if (!empty($tiposServico)): ?>
+                                <?php foreach ($tiposServico as $tipo): ?>
+                                    <option value="<?= htmlspecialchars($tipo['tipo_servico']) ?>">
+                                        <?= htmlspecialchars($tipo['tipo_servico']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="servico_status_filter">Status do Pagamento:</label>
+                        <select id="servico_status_filter">
+                            <option value="">Todos</option>
+                            <?php if (!empty($statusPagamentos)): ?>
+                                <?php foreach ($statusPagamentos as $status): ?>
+                                    <option value="<?= htmlspecialchars($status['status_pagamento']) ?>">
+                                        <?= htmlspecialchars($status['status_pagamento']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="servico_filter_type">Filtrar por:</label>
+                        <select id="servico_filter_type">
+                            <option value="">Selecione</option>
+                            <option value="periodo">Período</option>
+                            <option value="ano">Ano</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="servico_filter_value">Valor:</label>
+                        <select id="servico_filter_value" disabled>
+                            <option value="">Selecione</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="clients">
                     <table>
@@ -327,7 +367,24 @@
                 <button class="btn btn-primary" onclick="novaCompra()">Nova Compra</button>
                 </div>
 
-                <input type="text" class="search-bar" placeholder="Buscar por material ou distribuidora">
+                <input type="text" id="search_compra" class="search-bar" placeholder="Buscar por material ou distribuidora">
+
+                <div class="filters">
+                    <div class="form-group">
+                        <label for="compra_filter_type">Filtrar por:</label>
+                        <select id="compra_filter_type">
+                            <option value="">Selecione</option>
+                            <option value="periodo">Período</option>
+                            <option value="ano">Ano</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="compra_filter_value">Valor:</label>
+                        <select id="compra_filter_value" disabled>
+                            <option value="">Selecione</option>
+                        </select>
+                    </div>
+                </div>
 
                 <div class="clients">
                     <table>
@@ -497,7 +554,8 @@
                 <input type="hidden" name="id" id="id_servico">
                 <div class="form-group">
                     <label for="id_cliente_servico">Cliente:</label>
-                    <select id="id_cliente_servico" name="id_cliente" required>
+                    <select id="id_cliente_servico" name="id_cliente" required size="6" data-searchable="1">
+                        <div id="cliente_search_status" class="select-search-status">Digite para filtrar</div>
                         <option value="">Selecione</option>
                         <?php
                         $clienteController = new App\Controllers\ClienteController();

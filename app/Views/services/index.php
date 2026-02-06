@@ -1,5 +1,5 @@
 <?php foreach ($servicos as $servico): ?>
-<tr>
+<tr data-status="<?= htmlspecialchars($servico['status_pagamento'] ?? '') ?>">
     <td><?= $servico['cliente_nome'] ?></td>
     <td><?= $servico['tipo_servico'] ?></td>
     <td><?= date('d/m/Y', strtotime($servico['data_hora'])) ?></td>

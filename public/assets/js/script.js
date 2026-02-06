@@ -64,6 +64,435 @@ function closeModal(modalId) {
     }
 }
 
+function irParaPendentes() {
+    window.location.href = baseUrl + '/?page=servicos&status_pagamento=' + encodeURIComponent('Pendente');
+}
+
+function irParaCompras30Dias() {
+    window.location.href = baseUrl + '/?page=pecas&compra_filter_type=periodo&compra_filter_value=30';
+}
+
+function irParaServicos30Dias() {
+    window.location.href = baseUrl + '/?page=servicos&servico_filter_type=periodo&servico_filter_value=30';
+}
+
+function normalizeSearchText(text) {
+    return (text || '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+}
+
+function filterTableRows(tbodyId, columns, term) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) {
+        return;
+    }
+    const normalizedTerm = normalizeSearchText(term);
+    const rows = Array.from(tbody.rows || []);
+
+    rows.forEach(row => {
+        if (!row.cells || row.cells.length === 0) {
+            return;
+        }
+        if (row.cells.length === 1 && row.cells[0].colSpan > 1) {
+            row.style.display = normalizedTerm ? 'none' : '';
+            return;
+        }
+        if (!normalizedTerm) {
+            row.style.display = '';
+            return;
+        }
+        const match = columns.some(index => {
+            const cell = row.cells[index];
+            if (!cell) {
+                return false;
+            }
+            const text = normalizeSearchText(cell.textContent || '');
+            return text.includes(normalizedTerm);
+        });
+        row.style.display = match ? '' : 'none';
+    });
+}
+
+function setupSearchInput(inputId, tbodyId, columns) {
+    const input = document.getElementById(inputId);
+    if (!input) {
+        return;
+    }
+    const handler = function() {
+        filterTableRows(tbodyId, columns, input.value);
+    };
+    input.addEventListener('input', handler);
+    handler();
+}
+
+function parseDateDdMmYyyy(text) {
+    const parts = (text || '').trim().split('/');
+    if (parts.length !== 3) {
+        return null;
+    }
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10);
+    const year = parseInt(parts[2], 10);
+    if (!day || !month || !year) {
+        return null;
+    }
+    return new Date(year, month - 1, day);
+}
+
+function getDateRange(type, value) {
+    if (!type || !value) {
+        return null;
+    }
+    const now = new Date();
+    if (type === 'periodo') {
+        const days = parseInt(value, 10);
+        if (!days) {
+            return null;
+        }
+        const end = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        const start = new Date(end);
+        start.setDate(start.getDate() - (days - 1));
+        start.setHours(0, 0, 0, 0);
+        return { start, end };
+    }
+    if (type === 'ano') {
+        const year = parseInt(value, 10);
+        if (!year) {
+            return null;
+        }
+        const start = new Date(year, 0, 1, 0, 0, 0, 0);
+        const end = new Date(year, 11, 31, 23, 59, 59, 999);
+        return { start, end };
+    }
+    return null;
+}
+
+function populatePeriodYearSelect(select, type) {
+    if (!select) {
+        return;
+    }
+    select.innerHTML = '<option value="">Selecione</option>';
+    if (!type) {
+        select.disabled = true;
+        return;
+    }
+    if (type === 'periodo') {
+        select.insertAdjacentHTML('beforeend',
+            '<option value="7">7 dias</option>' +
+            '<option value="15">15 dias</option>' +
+            '<option value="30">30 dias</option>'
+        );
+    } else if (type === 'ano') {
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= currentYear - 4; year -= 1) {
+            select.insertAdjacentHTML('beforeend', '<option value="' + year + '">' + year + '</option>');
+        }
+    }
+    select.disabled = false;
+}
+
+function applyCompraFilters() {
+    const tbody = document.getElementById('compraTable');
+    if (!tbody) {
+        return;
+    }
+    const searchInput = document.getElementById('search_compra');
+    const filterType = document.getElementById('compra_filter_type');
+    const filterValue = document.getElementById('compra_filter_value');
+    const searchTerm = searchInput ? normalizeSearchText(searchInput.value) : '';
+    const range = getDateRange(filterType ? filterType.value : '', filterValue ? filterValue.value : '');
+
+    const rows = Array.from(tbody.rows || []);
+    rows.forEach(row => {
+        if (!row.cells || row.cells.length === 0) {
+            return;
+        }
+        if (row.cells.length === 1 && row.cells[0].colSpan > 1) {
+            row.style.display = (searchTerm || range) ? 'none' : '';
+            return;
+        }
+
+        const materialText = normalizeSearchText((row.cells[1] && row.cells[1].textContent) || '');
+        const distribuidoraText = normalizeSearchText((row.cells[5] && row.cells[5].textContent) || '');
+        const matchesSearch = !searchTerm || materialText.includes(searchTerm) || distribuidoraText.includes(searchTerm);
+
+        let matchesDate = true;
+        if (range) {
+            const dateText = (row.cells[0] && row.cells[0].textContent) || '';
+            const compraDate = parseDateDdMmYyyy(dateText);
+            matchesDate = compraDate ? (compraDate >= range.start && compraDate <= range.end) : false;
+        }
+
+        row.style.display = (matchesSearch && matchesDate) ? '' : 'none';
+    });
+}
+
+function setupCompraFilters() {
+    const searchInput = document.getElementById('search_compra');
+    const filterType = document.getElementById('compra_filter_type');
+    const filterValue = document.getElementById('compra_filter_value');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyCompraFilters);
+    }
+    if (filterType) {
+        filterType.addEventListener('change', function() {
+            populatePeriodYearSelect(filterValue, filterType.value);
+            applyCompraFilters();
+        });
+    }
+    if (filterValue) {
+        filterValue.addEventListener('change', applyCompraFilters);
+    }
+
+    populatePeriodYearSelect(filterValue, filterType ? filterType.value : '');
+    applyCompraFilters();
+}
+
+function applyCompraFilterFromUrl() {
+    const filterType = document.getElementById('compra_filter_type');
+    const filterValue = document.getElementById('compra_filter_value');
+    if (!filterType || !filterValue) {
+        return;
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('compra_filter_type');
+    const valueParam = urlParams.get('compra_filter_value');
+    if (!typeParam || !valueParam) {
+        return;
+    }
+    filterType.value = typeParam;
+    populatePeriodYearSelect(filterValue, filterType.value);
+    const optionExists = Array.from(filterValue.options || []).some(option => option.value === valueParam);
+    if (optionExists) {
+        filterValue.value = valueParam;
+    }
+    applyCompraFilters();
+}
+
+function applyServicoFilters() {
+    const tbody = document.getElementById('servicoTable');
+    const list = document.getElementById('servicoList');
+    if (!tbody && !list) {
+        return;
+    }
+    const searchInput = document.getElementById('search_servico');
+    const tipoSelect = document.getElementById('servico_tipo_filter');
+    const statusSelect = document.getElementById('servico_status_filter');
+    const filterType = document.getElementById('servico_filter_type');
+    const filterValue = document.getElementById('servico_filter_value');
+    const searchTerm = searchInput ? normalizeSearchText(searchInput.value) : '';
+    const tipoTerm = tipoSelect ? normalizeSearchText(tipoSelect.value) : '';
+    const statusTerm = statusSelect ? normalizeSearchText(statusSelect.value) : '';
+    const range = getDateRange(filterType ? filterType.value : '', filterValue ? filterValue.value : '');
+
+    if (tbody) {
+        const layout = (tbody.dataset && tbody.dataset.layout) ? tbody.dataset.layout : 'main';
+        const dateIndex = layout === 'ficha' ? 0 : 2;
+        const tipoIndex = 1;
+        const clienteIndex = layout === 'ficha' ? null : 0;
+        const rows = Array.from(tbody.rows || []);
+        rows.forEach(row => {
+            if (!row.cells || row.cells.length === 0) {
+                return;
+            }
+            if (row.cells.length === 1 && row.cells[0].colSpan > 1) {
+                row.style.display = (searchTerm || range) ? 'none' : '';
+                return;
+            }
+
+            const clienteText = clienteIndex === null ? '' : normalizeSearchText((row.cells[clienteIndex] && row.cells[clienteIndex].textContent) || '');
+            const tipoText = normalizeSearchText((row.cells[tipoIndex] && row.cells[tipoIndex].textContent) || '');
+            const matchesSearch = !searchTerm || (clienteIndex !== null && clienteText.includes(searchTerm));
+            const matchesTipo = !tipoTerm || tipoText === tipoTerm;
+            const rowStatus = normalizeSearchText((row.dataset && row.dataset.status) ? row.dataset.status : '');
+            const matchesStatus = !statusTerm || rowStatus === statusTerm;
+
+            let matchesDate = true;
+            if (range) {
+                const dateText = (row.cells[dateIndex] && row.cells[dateIndex].textContent) || '';
+                const servicoDate = parseDateDdMmYyyy(dateText);
+                matchesDate = servicoDate ? (servicoDate >= range.start && servicoDate <= range.end) : false;
+            }
+
+            row.style.display = (matchesSearch && matchesTipo && matchesStatus && matchesDate) ? '' : 'none';
+        });
+        return;
+    }
+
+    const items = Array.from(list.querySelectorAll('li'));
+    items.forEach(item => {
+        const tipoText = normalizeSearchText(item.dataset.tipo || '');
+        const rowStatus = normalizeSearchText(item.dataset.status || '');
+        const dateText = item.dataset.date || '';
+        const matchesSearch = !searchTerm;
+        const matchesTipo = !tipoTerm || tipoText === tipoTerm;
+        const matchesStatus = !statusTerm || rowStatus === statusTerm;
+
+        let matchesDate = true;
+        if (range) {
+            const servicoDate = parseDateDdMmYyyy(dateText);
+            matchesDate = servicoDate ? (servicoDate >= range.start && servicoDate <= range.end) : false;
+        }
+
+        item.style.display = (matchesSearch && matchesTipo && matchesStatus && matchesDate) ? '' : 'none';
+    });
+}
+
+function setupServicoFilters() {
+    const searchInput = document.getElementById('search_servico');
+    const tipoSelect = document.getElementById('servico_tipo_filter');
+    const statusSelect = document.getElementById('servico_status_filter');
+    const filterType = document.getElementById('servico_filter_type');
+    const filterValue = document.getElementById('servico_filter_value');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', applyServicoFilters);
+    }
+    if (tipoSelect) {
+        tipoSelect.addEventListener('change', applyServicoFilters);
+    }
+    if (statusSelect) {
+        statusSelect.addEventListener('change', applyServicoFilters);
+    }
+    if (filterType) {
+        filterType.addEventListener('change', function() {
+            populatePeriodYearSelect(filterValue, filterType.value);
+            applyServicoFilters();
+        });
+    }
+    if (filterValue) {
+        filterValue.addEventListener('change', applyServicoFilters);
+    }
+
+    populatePeriodYearSelect(filterValue, filterType ? filterType.value : '');
+    applyServicoFilters();
+}
+
+function applyServicoStatusFromUrl() {
+    const statusSelect = document.getElementById('servico_status_filter');
+    if (!statusSelect) {
+        return;
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const statusParam = urlParams.get('status_pagamento');
+    if (!statusParam) {
+        return;
+    }
+    const normalized = normalizeSearchText(statusParam);
+    const options = Array.from(statusSelect.options || []);
+    const match = options.find(option => normalizeSearchText(option.value) === normalized);
+    if (match) {
+        statusSelect.value = match.value;
+        applyServicoFilters();
+    }
+}
+
+function applyServicoFilterFromUrl() {
+    const filterType = document.getElementById('servico_filter_type');
+    const filterValue = document.getElementById('servico_filter_value');
+    if (!filterType || !filterValue) {
+        return;
+    }
+    const urlParams = new URLSearchParams(window.location.search);
+    const typeParam = urlParams.get('servico_filter_type');
+    const valueParam = urlParams.get('servico_filter_value');
+    if (!typeParam || !valueParam) {
+        return;
+    }
+    filterType.value = typeParam;
+    populatePeriodYearSelect(filterValue, filterType.value);
+    const optionExists = Array.from(filterValue.options || []).some(option => option.value === valueParam);
+    if (optionExists) {
+        filterValue.value = valueParam;
+    }
+    applyServicoFilters();
+}
+
+function updateClienteSearchStatus(select) {
+    const status = document.getElementById('cliente_search_status');
+    if (!status) {
+        return;
+    }
+    const term = (select && select.dataset && select.dataset.searchTerm) ? select.dataset.searchTerm : '';
+    if (term) {
+        status.textContent = 'Filtro: "' + term + '"';
+    } else {
+        status.textContent = 'Digite para filtrar';
+    }
+}
+
+function filterClienteSelect(select, term) {
+    if (!select) {
+        return;
+    }
+    const options = Array.from(select.options);
+    const normalized = normalizeSearchText(term);
+
+    options.forEach(option => {
+        if (!option.dataset.search) {
+            option.dataset.search = normalizeSearchText(option.textContent || '');
+        }
+        if (option.value === '') {
+            option.hidden = false;
+            return;
+        }
+        option.hidden = normalized !== '' && !option.dataset.search.includes(normalized);
+    });
+
+    const selected = select.options[select.selectedIndex];
+    if (selected && selected.hidden) {
+        select.value = '';
+    }
+    updateClienteSearchStatus(select);
+}
+
+function resetClienteSelectFilter(select) {
+    if (!select) {
+        return;
+    }
+    select.dataset.searchTerm = '';
+    filterClienteSelect(select, '');
+}
+
+function setupClienteSelectSearch() {
+    const select = document.getElementById('id_cliente_servico');
+    if (!select) {
+        return;
+    }
+
+    resetClienteSelectFilter(select);
+
+    select.addEventListener('keydown', function(event) {
+        const key = event.key;
+        if (key === 'Backspace') {
+            const term = (select.dataset.searchTerm || '').slice(0, -1);
+            select.dataset.searchTerm = term;
+            filterClienteSelect(select, term);
+            event.preventDefault();
+            return;
+        }
+        if (key === 'Escape' || key === 'Delete') {
+            resetClienteSelectFilter(select);
+            event.preventDefault();
+            return;
+        }
+        if (key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey) {
+            const term = (select.dataset.searchTerm || '') + key;
+            select.dataset.searchTerm = term;
+            filterClienteSelect(select, term);
+            event.preventDefault();
+        }
+    });
+
+    select.addEventListener('blur', function() {
+        resetClienteSelectFilter(select);
+    });
+}
+
 function novoServico() {
     const formServico = document.getElementById('formServico');
     if (!formServico) {
@@ -95,6 +524,8 @@ function novoServico() {
     if (formaSelect) {
         formaSelect.value = '';
     }
+    const clienteSelect = document.getElementById('id_cliente_servico');
+    resetClienteSelectFilter(clienteSelect);
 
     const titulo = document.getElementById('tituloModalServico');
     if (titulo) {
@@ -365,6 +796,8 @@ function editarServico(id) {
             document.getElementById('tituloModalServico').textContent = 'Editar Serviço';
             document.getElementById('btnSalvarServico').textContent = 'Atualizar';
             document.getElementById('formServico').action = baseUrl + '/servicos/update';
+            const clienteSelect = document.getElementById('id_cliente_servico');
+            resetClienteSelectFilter(clienteSelect);
             openModal('modalServico');
         });
 }
@@ -391,7 +824,11 @@ function verFichaCliente(id) {
     fetch(baseUrl + '/clientes/ficha?id=' + id)
         .then(r => r.text())
         .then(html => {
-            document.querySelector('.main-content').innerHTML = html;
+            const container = document.querySelector('.main-content');
+            if (container) {
+                container.innerHTML = html;
+            }
+            setupServicoFilters();
         });
 }
 
@@ -480,13 +917,25 @@ function atualizarOpcoesFiltro() {
 
 // Função para filtrar serviços por período ou ano
 function filtrarServicos() {
-    const tipoFiltro = document.getElementById('tipo-filtro').value;
+    const tipoFiltroEl = document.getElementById('tipo-filtro');
+    const periodoEl = document.getElementById('filtro-periodo');
+    const anoEl = document.getElementById('filtro-ano');
+    if (!tipoFiltroEl) {
+        return;
+    }
+    const tipoFiltro = tipoFiltroEl.value;
     let parametroFiltro = '';
 
     if (tipoFiltro === 'periodo') {
-        parametroFiltro = document.getElementById('filtro-periodo').value;
+        if (!periodoEl) {
+            return;
+        }
+        parametroFiltro = periodoEl.value;
     } else {
-        parametroFiltro = document.getElementById('filtro-ano').value;
+        if (!anoEl) {
+            return;
+        }
+        parametroFiltro = anoEl.value;
     }
 
     fetch('../backend/php/lista_servicos.php?filtro-periodo=' + encodeURIComponent(parametroFiltro))
@@ -502,6 +951,16 @@ function filtrarServicos() {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', function() {
+    setupClienteSelectSearch();
+    setupSearchInput('search_admin', 'adminTable', [0, 1]);
+    setupSearchInput('search_cliente', 'clienteTable', [0, 2]);
+    setupSearchInput('search_sindico', 'sindicoTable', [0, 1]);
+    setupCompraFilters();
+    applyCompraFilterFromUrl();
+    setupServicoFilters();
+    applyServicoStatusFromUrl();
+    applyServicoFilterFromUrl();
+
     // Validação do formulário de serviço
     const formServico = document.getElementById('formServico');
     if (formServico) {
@@ -571,9 +1030,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Filtros de serviços
+    // Filtros de serviços legados (se existirem)
     const selectPeriodo = document.getElementById('filtro-periodo');
     const selectAno = document.getElementById('filtro-ano');
+    const tipoFiltro = document.getElementById('tipo-filtro');
 
     if (selectPeriodo) {
         selectPeriodo.addEventListener('change', filtrarServicos);
@@ -583,8 +1043,9 @@ document.addEventListener('DOMContentLoaded', function() {
         selectAno.addEventListener('change', filtrarServicos);
     }
 
-    // Carregar filtros padrão
-    filtrarServicos();
+    if (tipoFiltro && (selectPeriodo || selectAno)) {
+        filtrarServicos();
+    }
 
     // Verificar mensagens de URL
     const urlParams = new URLSearchParams(window.location.search);

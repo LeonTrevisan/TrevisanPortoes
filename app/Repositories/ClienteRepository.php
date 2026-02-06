@@ -179,9 +179,11 @@ class ClienteRepository
     public function getServicos(int $id_cliente): array
     {
         $stmt = $this->db->prepare("
-            SELECT s.*, ts.tipo_servico
+            SELECT s.*, ts.tipo_servico, sp.status_pagamento
             FROM tb_servico s
             JOIN tb_tipo_servico ts ON s.id_tipo = ts.id_tipo
+            LEFT JOIN tb_pagamento p ON p.id_servico = s.id_servico
+            LEFT JOIN tb_status_pagamento sp ON p.id_status = sp.id_status
             WHERE s.id_cliente = :id_cliente
             ORDER BY s.data_hora DESC
         ");

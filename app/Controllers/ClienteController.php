@@ -104,6 +104,17 @@ class ClienteController
             return;
         }
         $servicos = $this->service->getServicos((int)$id);
+        $db = Database::connect();
+        $tiposServico = $db->query("
+            SELECT id_tipo, tipo_servico
+            FROM tb_tipo_servico
+            ORDER BY tipo_servico ASC
+        ")->fetchAll();
+        $statusPagamentos = $db->query("
+            SELECT id_status, status_pagamento
+            FROM tb_status_pagamento
+            ORDER BY id_status ASC
+        ")->fetchAll();
         require __DIR__ . '/../Views/clients/ficha.php';
     }
 

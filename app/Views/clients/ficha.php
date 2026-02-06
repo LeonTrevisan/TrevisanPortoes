@@ -47,14 +47,61 @@
 
     <div class="servicos-info info">
         <h3>Serviços Prestados</h3>
+        <div class="filters">
+            <div class="form-group">
+                <label for="servico_tipo_filter">Tipo de Serviço:</label>
+                <select id="servico_tipo_filter">
+                    <option value="">Todos</option>
+                    <?php if (!empty($tiposServico)): ?>
+                        <?php foreach ($tiposServico as $tipo): ?>
+                            <option value="<?= htmlspecialchars($tipo['tipo_servico']) ?>">
+                                <?= htmlspecialchars($tipo['tipo_servico']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="servico_status_filter">Status do Pagamento:</label>
+                <select id="servico_status_filter">
+                    <option value="">Todos</option>
+                    <?php if (!empty($statusPagamentos)): ?>
+                        <?php foreach ($statusPagamentos as $status): ?>
+                            <option value="<?= htmlspecialchars($status['status_pagamento']) ?>">
+                                <?= htmlspecialchars($status['status_pagamento']) ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="servico_filter_type">Filtrar por:</label>
+                <select id="servico_filter_type">
+                    <option value="">Selecione</option>
+                    <option value="periodo">Período</option>
+                    <option value="ano">Ano</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="servico_filter_value">Valor:</label>
+                <select id="servico_filter_value" disabled>
+                    <option value="">Selecione</option>
+                </select>
+            </div>
+        </div>
+
         <?php if (empty($servicos)): ?>
             <p>Nenhum serviço registrado.</p>
         <?php else: ?>
-            <ul>
+            <ul id="servicoList" data-layout="ficha">
                 <?php foreach ($servicos as $servico): ?>
-                    <li>
+                    <li
+                        data-status="<?= htmlspecialchars($servico['status_pagamento'] ?? '') ?>"
+                        data-date="<?= htmlspecialchars(date('d/m/Y', strtotime($servico['data_hora']))) ?>"
+                        data-tipo="<?= htmlspecialchars($servico['tipo_servico']) ?>"
+                    >
                         <hr>
-                        <strong>Data:</strong> <?= htmlspecialchars($servico['data_hora']) ?><br>
+                        <strong>Data:</strong> <?= htmlspecialchars(date('d/m/Y', strtotime($servico['data_hora']))) ?><br>
                         <strong>Tipo:</strong> <?= htmlspecialchars($servico['tipo_servico']) ?><br>
                         <strong>Descrição:</strong> <?= htmlspecialchars($servico['descricao'] ?? 'N/A') ?>
                     </li>
