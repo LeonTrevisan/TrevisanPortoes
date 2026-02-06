@@ -17,4 +17,12 @@
             <p><strong>Comprovante:</strong> <a href="<?= htmlspecialchars($servico['comprovante']) ?>" target="_blank">Ver Comprovante</a></p>
         <?php endif; ?>
     </div>
+    <div class="pagamento-info ficha-info">
+        <p>
+            <h3>Pagamento</h3>
+        </p>
+        <p><strong>Status:</strong> <?= htmlspecialchars($servico['status_pagamento'] ?? 'Sem pagamento') ?></p>
+        <p><strong>Forma de pagamento:</strong> <?= htmlspecialchars($servico['forma_pagamento'] ?? 'N/A') ?></p>
+        <p><strong>Valor:</strong> <?= $servico['valor'] !== null ? 'R$ ' . number_format((float)$servico['valor'], 2, ',', '.') : 'N/A' ?></p>
+    </div>
 </div>

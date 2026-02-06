@@ -112,7 +112,16 @@ class ClienteRepository
                     WHERE id_cliente = :id";
 
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(array_merge($dados, [':id' => $id]));
+            $stmt->execute([
+                ':id_admin' => $dados['id_admin'],
+                ':id_sindico' => $dados['id_sindico'],
+                ':id_tipo_cliente' => $dados['id_tipo_cliente'],
+                ':telefone' => $dados['telefone'],
+                ':nome' => $dados['nome'],
+                ':email' => $dados['email'],
+                ':cnpj' => $dados['cnpj'],
+                ':id' => $id
+            ]);
 
             // Verificar se endereço existe
             $stmtCheck = $this->db->prepare("SELECT id_endereco FROM tb_endereco WHERE id_cliente = :id_cliente");

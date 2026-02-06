@@ -8,13 +8,13 @@ class ServicoService
 {
     public function __construct(private ServicoRepository $repository) {}
 
-    public function cadastrar(array $dados): void
+    public function cadastrar(array $dados): int
     {
         if(empty($dados['id_cliente']) || empty($dados['id_tipo']) || empty($dados['data_hora'])){
             throw new \InvalidArgumentException("Cliente, tipo e data/hora são obrigatórios.");
         }
 
-        $this->repository->criar($dados);
+        return $this->repository->criar($dados);
     }
 
     public function listarTodos(): array

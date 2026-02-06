@@ -35,6 +35,27 @@ class AdminController
         }
     }
 
+    public function update(): void {
+        $id = $_POST['id'] ?? $_POST['id_admin'] ?? null;
+        if(!$id) {
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=admin&status=error&message=ID nÃ£o fornecido');
+            exit();
+        }
+        try {
+            $this->service->atualizar((int)$id, [
+                'nome' => $_POST['nome'] ?? '',
+                'telefone' => $_POST['telefone'] ?? '',
+                'email' => $_POST['email'] ?? ''
+            ]);
+
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=admin&status=success');
+            exit();
+        } catch(\Throwable $e) {
+            header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=admin&status=error&message=' . urlencode($e->getMessage()));
+            exit();
+        }
+    }
+
     public function obter() {
         $id = $_GET['id'] ?? null;
 

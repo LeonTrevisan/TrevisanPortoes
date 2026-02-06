@@ -13,6 +13,86 @@
     $adminController = new AdminController();
     $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
 
+    $dashboard = [
+        'clientes_ativos' => 0,
+        'servicos_mes' => 0,
+        'compras_mes' => 0.0,
+        'pagamentos_pendentes' => 0
+    ];
+    $ultimosServicos = [];
+    $statusPagamentos = [];
+    $formasPagamento = [];
+
+    $meses = [
+        '01' => 'Janeiro',
+        '02' => 'Fevereiro',
+        '03' => 'Março',
+        '04' => 'Abril',
+        '05' => 'Maio',
+        '06' => 'Junho',
+        '07' => 'Julho',
+        '08' => 'Agosto',
+        '09' => 'Setembro',
+        '10' => 'Outubro',
+        '11' => 'Novembro',
+        '12' => 'Dezembro'
+    ];
+    $mesAtualLabel = $meses[date('m')] . ' ' . date('Y');
+    $mesInicio = (new DateTimeImmutable('first day of this month'))->format('Y-m-01');
+    $mesFim = (new DateTimeImmutable('first day of next month'))->format('Y-m-01');
+
+    $fetchScalar = function(string $sql, array $params = []) use ($db) {
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt->fetchColumn();
+    };
+
+    try {
+        $dashboard['clientes_ativos'] = (int)$fetchScalar(
+            "SELECT COUNT(*) FROM tb_cliente WHERE deleted_at IS NULL"
+        );
+        $dashboard['servicos_mes'] = (int)$fetchScalar(
+            "SELECT COUNT(*) FROM tb_servico WHERE data_hora >= :inicio AND data_hora < :fim",
+            [':inicio' => $mesInicio, ':fim' => $mesFim]
+        );
+        $dashboard['compras_mes'] = (float)$fetchScalar(
+            "SELECT COALESCE(SUM(valor_total), 0) FROM tb_compras WHERE data_compra >= :inicio AND data_compra < :fim",
+            [':inicio' => $mesInicio, ':fim' => $mesFim]
+        );
+        $dashboard['pagamentos_pendentes'] = (int)$fetchScalar(
+            "SELECT COUNT(*)
+             FROM tb_pagamento p
+             JOIN tb_status_pagamento s ON p.id_status = s.id_status
+             WHERE s.status_pagamento = 'Pendente'"
+        );
+
+        $stmt = $db->prepare("
+            SELECT s.data_hora, c.nome AS cliente_nome, ts.tipo_servico, sp.status_pagamento
+            FROM tb_servico s
+            JOIN tb_cliente c ON s.id_cliente = c.id_cliente
+            JOIN tb_tipo_servico ts ON s.id_tipo = ts.id_tipo
+            LEFT JOIN tb_pagamento p ON p.id_servico = s.id_servico
+            LEFT JOIN tb_status_pagamento sp ON p.id_status = sp.id_status
+            ORDER BY s.data_hora DESC
+            LIMIT 5
+        ");
+        $stmt->execute();
+        $ultimosServicos = $stmt->fetchAll();
+
+        $statusPagamentos = $db->query("
+            SELECT id_status, status_pagamento
+            FROM tb_status_pagamento
+            ORDER BY id_status ASC
+        ")->fetchAll();
+
+        $formasPagamento = $db->query("
+            SELECT id_forma_pagamento, forma_pagamento
+            FROM tb_forma_pagamento
+            ORDER BY id_forma_pagamento ASC
+        ")->fetchAll();
+    } catch (\Throwable $e) {
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -51,16 +131,20 @@
 
                 <div class="stats-grid">
                     <div class="stat-card">
+                        <h3>Clientes Ativos</h3>
+                        <div class="value"><?= $dashboard['clientes_ativos'] ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Serviços no Mês (<?= $mesAtualLabel ?>)</h3>
+                        <div class="value"><?= $dashboard['servicos_mes'] ?></div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Compras do Mês (<?= $mesAtualLabel ?>)</h3>
+                        <div class="value">R$ <?= number_format($dashboard['compras_mes'], 2, ',', '.') ?></div>
+                    </div>
+                    <div class="stat-card">
                         <h3>Pagamentos Pendentes</h3>
-                        <div class="value">8</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Serviços Concluídos (Mês)</h3>
-                        <div class="value">127</div>
-                    </div>
-                    <div class="stat-card">
-                        <h3>Compras do Mês</h3>
-                        <div class="value">R$ 8.450</div>
+                        <div class="value"><?= $dashboard['pagamentos_pendentes'] ?></div>
                     </div>
                 </div>
 
@@ -76,24 +160,29 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>07/01/2026</td>
-                                <td>João Silva</td>
-                                <td>Manutenção Preventiva</td>
-                                <td><span class="status status-agendado">Pendente</span></td>
-                            </tr>
-                            <tr>
-                                <td>08/01/2026</td>
-                                <td>Maria Santos</td>
-                                <td>Instalação de Equipamento</td>
-                                <td><span class="status status-agendado">Pendente</span></td>
-                            </tr>
-                            <tr>
-                                <td>09/01/2026</td>
-                                <td>Pedro Costa</td>
-                                <td>Reparo de Sistema</td>
-                                <td><span class="status status-agendado">Pendente</span></td>
-                            </tr>
+                            <?php if (empty($ultimosServicos)): ?>
+                                <tr>
+                                    <td colspan="4">Nenhum serviço encontrado.</td>
+                                </tr>
+                            <?php else: ?>
+                                <?php foreach ($ultimosServicos as $servico): ?>
+                                    <?php
+                                        $statusPagamento = $servico['status_pagamento'] ?? 'Sem pagamento';
+                                        $statusClass = 'status-agendado';
+                                        if ($statusPagamento === 'Pago') {  
+                                            $statusClass = 'status-concluido';
+                                        } elseif ($statusPagamento === 'Cancelado') {
+                                            $statusClass = 'status-cancelado';
+                                        }
+                                    ?>
+                                    <tr>
+                                        <td><?= date('d/m/Y', strtotime($servico['data_hora'])) ?></td>
+                                        <td><?= htmlspecialchars($servico['cliente_nome']) ?></td>
+                                        <td><?= htmlspecialchars($servico['tipo_servico']) ?></td>
+                                        <td><span class="status <?= $statusClass ?>"><?= htmlspecialchars($statusPagamento) ?></span></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
@@ -107,7 +196,7 @@
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="openModal('modalAdm')">Novo Administrador</button>
+                <button class="btn btn-primary" onclick="novoAdmin()">Novo Administrador</button>
                 </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
@@ -137,7 +226,7 @@
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="openModal('modalCliente')">Novo Cliente</button>
+                <button class="btn btn-primary" onclick="novoCliente()">Novo Cliente</button>
                 </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por nome ou telefone">
@@ -170,7 +259,7 @@
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="openModal('modalSindico')">Novo Síndico</button>
+                <button class="btn btn-primary" onclick="novoSindico()">Novo Síndico</button>
                 </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por nome ou telefone">
@@ -202,7 +291,7 @@
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="openModal('modalServico')">Novo Serviço</button>
+                <button class="btn btn-primary" onclick="novoServico()">Novo Serviço</button>
                 </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por cliente ou tipo">
@@ -235,7 +324,7 @@
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="openModal('modalCompra')">Nova Compra</button>
+                <button class="btn btn-primary" onclick="novaCompra()">Nova Compra</button>
                 </div>
 
                 <input type="text" class="search-bar" placeholder="Buscar por material ou distribuidora">
@@ -381,7 +470,7 @@
                 <h3 id="tituloModalSindico">Novo Síndico</h3>
             </div>
             <form id="formSindico" action="<?= $baseUrl ?>/sindico/store" method="POST">
-                <input type="hidden" name="id" id="id_sindico">
+                <input type="hidden" name="id" id="id_sindico_hidden">
                 <div class="form-group">
                     <label for="nome_sindico">Nome:</label>
                     <input type="text" id="nome_sindico" name="nome" required>
@@ -427,6 +516,35 @@
                 <div class="form-group">
                     <label for="data_hora_servico">Data:</label>
                     <input type="date" id="data_hora_servico" name="data_hora" required>
+                </div>
+                <div class="form-group">
+                    <label for="statusPag">Status do Pagamento:</label>
+                    <select id="statusPag" name="id_status" required>
+                        <?php if (empty($statusPagamentos)): ?>
+                            <option value="">Sem status</option>
+                        <?php else: ?>
+                            <?php foreach ($statusPagamentos as $status): ?>
+                                <?php $isPago = strtolower($status['status_pagamento']) === 'pago'; ?>
+                                <option value="<?= $status['id_status'] ?>" data-is-paid="<?= $isPago ? '1' : '0' ?>"><?= htmlspecialchars($status['status_pagamento']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="form-group" id="forma_pagamento">
+                    <label for="id_forma_pagamento">Forma de Pagamento:</label>
+                    <select id="id_forma_pagamento" name="id_forma_pagamento">
+                        <?php if (empty($formasPagamento)): ?>
+                            <option value="">Sem formas cadastradas</option>
+                        <?php else: ?>
+                            <?php foreach ($formasPagamento as $forma): ?>
+                                <option value="<?= $forma['id_forma_pagamento'] ?>"><?= htmlspecialchars($forma['forma_pagamento']) ?></option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="valor_servico">Valor do Serviço:</label>
+                    <input type="text" id="valor_servico" name="valor_servico" required>
                 </div>
                 <div class="form-group">
                     <label for="descricao_servico">Descrição:</label>

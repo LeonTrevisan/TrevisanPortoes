@@ -8,21 +8,27 @@ class ServicoRepository
 {
     public function __construct(private PDO $db) {}
 
-    public function criar(array $dados): void
+    public function criar(array $dados): int
     {
         $sql = "INSERT INTO tb_servico (id_cliente, id_tipo, descricao, observacao, foto, comprovante, data_hora) 
                 VALUES (:id_cliente, :id_tipo, :descricao, :observacao, :foto, :comprovante, :data_hora)";
         $stmt = $this->db->prepare($sql);
         $stmt->execute($dados);
+        return (int)$this->db->lastInsertId();
     }
 
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare("
-            SELECT s.*, c.nome as cliente_nome, ts.tipo_servico
+            SELECT s.*, c.nome as cliente_nome, ts.tipo_servico,
+                   p.id_status, p.id_forma_pagamento, p.valor,
+                   sp.status_pagamento, fp.forma_pagamento
             FROM tb_servico s
             JOIN tb_cliente c ON s.id_cliente = c.id_cliente
             JOIN tb_tipo_servico ts ON s.id_tipo = ts.id_tipo
+            LEFT JOIN tb_pagamento p ON p.id_servico = s.id_servico
+            LEFT JOIN tb_status_pagamento sp ON p.id_status = sp.id_status
+            LEFT JOIN tb_forma_pagamento fp ON p.id_forma_pagamento = fp.id_forma_pagamento
             WHERE s.id_servico = :id
         ");
         $stmt->bindValue(':id', $id);

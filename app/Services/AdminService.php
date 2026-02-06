@@ -57,4 +57,18 @@ class AdminService
     {
         return $this->repository->getCondominios($id);
     }
+
+    public function atualizar(int $id, array $dados): void
+    {
+        if(empty($dados['nome']) || empty($dados['email'])){
+            throw new \InvalidArgumentException("Nome e email sÃ£o obrigatÃ³rios.");
+        }
+
+        $this->repository->atualizar(
+            $id,
+            $dados['nome'],
+            $dados['telefone'] ?? '',
+            $dados['email']
+        );
+    }
 }

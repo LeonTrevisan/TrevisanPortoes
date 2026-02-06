@@ -34,7 +34,7 @@ class SindicoController
     }
 
     public function obter() {
-        $id = $_POST['id'];
+        $id = $_GET['id'] ?? $_POST['id'] ?? null;
         if(!$id) {
             http_response_code(400);
             echo json_encode(['error' => 'ID do síndico não fornecido.']);
@@ -79,7 +79,7 @@ class SindicoController
     }
 
     public function update(): void {
-        $id = $_POST['id'];
+        $id = $_GET['id'] ?? $_POST['id'] ?? $_POST['id_sindico'] ?? null;
         if(!$id) {
             header('Location: ' . dirname($_SERVER['SCRIPT_NAME']) . '/?page=sindico&status=error&message=ID não fornecido');
             exit();

@@ -82,4 +82,20 @@ class AdminRepository
         $stmt->execute();
         return $stmt->fetchAll();
     }
+
+    public function atualizar(int $id, string $nome, string $telefone, string $email): void
+    {
+        $sql = "
+            UPDATE tb_admin_cond 
+            SET nome = :nome, telefone = :telefone, email = :email
+            WHERE id_admin = :id
+        ";
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute([
+            ':nome' => $nome,
+            ':telefone' => $telefone,
+            ':email' => $email,
+            ':id' => $id
+        ]);
+    }
 }
