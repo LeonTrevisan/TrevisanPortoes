@@ -6,12 +6,14 @@ ini_set('display_errors', 1);
 require __DIR__ . '/../vendor/autoload.php';
 require_once '../app/Helpers/formatacao.php';
 
+use App\Core\Auth;
 use App\Controllers\AdminController;
-use App\Controllers\AdministradorController;
+use App\Controllers\AuthController;
 use App\Controllers\ClienteController;
-use App\Controllers\SindicoController;
-use App\Controllers\ServicoController;
 use App\Controllers\CompraController;
+use App\Controllers\FuncionarioController;
+use App\Controllers\ServicoController;
+use App\Controllers\SindicoController;
 use App\Controllers\SoftDeleteController;
 
 $request = $_SERVER['REQUEST_URI'];
@@ -19,6 +21,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 $router = [
     'GET' => [
+        '/funcionarios/obter' => [FuncionarioController::class, 'obter'],
         '/admin' => [AdminController::class, 'index'],
         '/admin/obter' => [AdminController::class, 'obter'],
         '/admin/ficha' => [AdminController::class, 'ficha'],
@@ -35,6 +38,11 @@ $router = [
         '/compras/obter' => [CompraController::class, 'obter'],
     ],
     'POST' => [
+        '/auth/login' => [AuthController::class, 'login'],
+        '/auth/logout' => [AuthController::class, 'logout'],
+        '/funcionarios/store' => [FuncionarioController::class, 'store'],
+        '/funcionarios/update' => [FuncionarioController::class, 'update'],
+        '/funcionarios/desativar' => [FuncionarioController::class, 'desativar'],
         '/admin/store' => [AdminController::class, 'store'],
         '/admin/update' => [AdminController::class, 'update'],
         '/clientes/store' => [ClienteController::class, 'store'],
@@ -59,6 +67,17 @@ if ($base !== '/') {
     $path = str_replace($base, '', $path);
 }
 
+Auth::start();
+$publicRoutes = [
+    'POST' => ['/auth/login'],
+];
+
+$isPublicRoute = in_array($path, $publicRoutes[$method] ?? [], true);
+if (!$isPublicRoute && !Auth::check()) {
+    header('Location: ' . $base . '/login.php');
+    exit();
+}
+
 if (isset($router[$method][$path])) {
     $controllerClass = $router[$method][$path][0];
     $methodName = $router[$method][$path][1];
@@ -66,5 +85,5 @@ if (isset($router[$method][$path])) {
     $controller->$methodName();
 } else {
     http_response_code(404);
-    echo 'Rota não encontrada';
+    echo 'Rota nao encontrada';
 }

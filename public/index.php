@@ -1,17 +1,36 @@
-<?php 
+﻿<?php
     require __DIR__ . '/../vendor/autoload.php';
     require_once '../app/Helpers/formatacao.php';
 
     use App\Controllers\AdminController;
-    use App\Repositories\AdminRepository;
-    use App\Repositories\SoftDeleteRepository;
-    use App\Services\AdminService;
+    use App\Controllers\FuncionarioController;
+    use App\Core\Auth;
     use App\Core\Database;
+    use App\Repositories\FuncionarioRepository;
+    use App\Services\FuncionarioService;
 
+    Auth::start();
+    $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
     $db = Database::connect();
 
+    // Garante schema/seed das contas antes de exigir autenticacao.
+    $funcionarioRepo = new FuncionarioRepository($db);
+    $funcionarioService = new FuncionarioService($funcionarioRepo);
+
+    if (!Auth::check()) {
+        header('Location: ' . $baseUrl . '/login.php');
+        exit();
+    }
+
+    $currentUser = Auth::user();
+    $isAdmin = !empty($currentUser['is_admin']);
+    $roleLabel = $currentUser['role_nome'] ?? 'Sem role';
+    $rolesFuncionario = $funcionarioService->listarRoles();
+    $logoutToken = Auth::csrfToken('logout');
+    $funcionarioFormToken = Auth::csrfToken('funcionario_form');
+
     $adminController = new AdminController();
-    $baseUrl = dirname($_SERVER['SCRIPT_NAME']);
+    $funcionarioController = new FuncionarioController();
 
     $dashboard = [
         'servicos_mes' => 0,
@@ -26,7 +45,7 @@
     $meses = [
         '01' => 'Janeiro',
         '02' => 'Fevereiro',
-        '03' => 'Março',
+        '03' => 'Marco',
         '04' => 'Abril',
         '05' => 'Maio',
         '06' => 'Junho',
@@ -102,7 +121,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trevisan Portões Automáticos</title>
+    <title>Trevisan Portoes Automaticos</title>
     <link rel="stylesheet" href="assets/css/style.css">
     <script>
         const baseUrl = '<?= $baseUrl ?>';
@@ -111,17 +130,24 @@
 </head>
 <body>
     <div class="header">
-        <h1>Trevisan Portões Automáticos</h1>
+        <h1>Trevisan Portoes Automaticos</h1>
+        <div class="header-actions">
+            <a class="btn btn-light" href="<?= $baseUrl ?>/?page=contas">Gerenciar Contas</a>
+            <form method="POST" action="<?= $baseUrl ?>/auth/logout">
+                <input type="hidden" name="_token" value="<?= htmlspecialchars($logoutToken) ?>">
+                <button type="submit" class="btn btn-secondary">Sair</button>
+            </form>
+        </div>
     </div>
 
     <div class="container">
         <div class="sidebar">
             <div class="menu-item active" data-page="dashboard" onclick="showPage('dashboard', this)">Dashboard</div>
             <div class="menu-item" data-page="clientes" onclick="showPage('clientes', this)">Clientes</div>
-            <div class="menu-item" data-page="admin" onclick="showPage('admin', this)">Adminsitradores</div>
-            <div class="menu-item" data-page="sindico" onclick="showPage('sindico', this)">Síndicos</div>
-            <div class="menu-item" data-page="servicos" onclick="showPage('servicos', this)">Serviços</div>
-            <div class="menu-item" data-page="pecas" onclick="showPage('pecas', this)">Peças e Materiais</div>
+            <div class="menu-item" data-page="admin" onclick="showPage('admin', this)">Administradores</div>
+            <div class="menu-item" data-page="sindico" onclick="showPage('sindico', this)">Sindicos</div>
+            <div class="menu-item" data-page="servicos" onclick="showPage('servicos', this)">Servicos</div>
+            <div class="menu-item" data-page="pecas" onclick="showPage('pecas', this)">Pecas e Materiais</div>
             <div class="menu-item" data-page="fichas" onclick="showPage('fichas', this)">Fichas</div>
         </div>
 
@@ -130,16 +156,16 @@
             <div id="dashboard" class="page active">
                 <div class="page-header">
                     <h2>Dashboard</h2>
-                    <p>Visão geral do sistema</p>
+                    <p>Visao geral do sistema</p>
                 </div>
 
                 <div class="stats-grid">
                     <div class="stat-card clickable" onclick="irParaServicos30Dias()">
-                        <h3>Serviços no Mês (<?= $mesAtualLabel ?>)</h3>
+                        <h3>Servicos no Mes (<?= $mesAtualLabel ?>)</h3>
                         <div class="value"><?= $dashboard['servicos_mes'] ?></div>
                     </div>
                     <div class="stat-card clickable" onclick="irParaCompras30Dias()">
-                        <h3>Compras do Mês (<?= $mesAtualLabel ?>)</h3>
+                        <h3>Compras do Mes (<?= $mesAtualLabel ?>)</h3>
                         <div class="value">R$ <?= number_format($dashboard['compras_mes'], 2, ',', '.') ?></div>
                     </div>
                     <div class="stat-card clickable" onclick="irParaPendentes()">
@@ -148,20 +174,20 @@
                     </div>
                 </div>
 
-                    <h3 style="margin-bottom: 1rem;">Últimos Serviços</h3>
+                    <h3 style="margin-bottom: 1rem;">Ultimos Servicos</h3>
                     <table>
                         <thead>
                             <tr>
                                 <th>Data</th>
                                 <th>Cliente</th>
-                                <th>Serviço</th>
-                                <th>Status Pagamento</th>
+                                <th>Servico</th>
+                                <th>Status do pagamento</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php if (empty($ultimosServicos)): ?>
                                 <tr>
-                                    <td colspan="4">Nenhum serviço encontrado.</td>
+                                    <td colspan="4">Nenhum servico encontrado.</td>
                                 </tr>
                             <?php else: ?>
                                 <?php foreach ($ultimosServicos as $servico): ?>
@@ -186,15 +212,72 @@
                     </table>
                 </div>
 
- <!-- Adminsitradores -->
+ <!-- Contas -->
+            <div id="contas" class="page">
+                <div class="page-header">
+                    <h2>Gerenciamento de Contas</h2>
+                    <p>
+                        <?php if ($isAdmin): ?>
+                            Crie, edite e desative contas internas de funcionarios (roles do sistema).
+                        <?php else: ?>
+                            Visualizacao da conta logada.
+                        <?php endif; ?>
+                    </p>
+                </div>
+
+                <?php if ($isAdmin): ?>
+                    <div class="menu">
+                        <button class="btn btn-primary" onclick="novoFuncionario()">Novo Funcionario</button>
+                    </div>
+
+                    <input type="text" id="search_funcionario" class="search-bar" placeholder="Buscar por nome ou email">
+
+                    <div class="clients">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="funcionarioTable">
+                                <?php $funcionarioController->index(); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php else: ?>
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem;">Minha Conta</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Status</th>
+                                    <th>Acoes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="funcionarioTable">
+                                <?php $funcionarioController->index(); ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
+            </div>
+
+ <!-- Administradores de Condominio -->
             <div id="admin" class="page">
                 <div class="page-header">
-                    <h2>Adminsitradores</h2>
-                    <p>Gerencie os administradores de condomínio</p>
+                    <h2>Administradores de Condominio</h2>
+                    <p>Gerencie os administradores vinculados aos clientes condominio</p>
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="novoAdmin()">Novo Administrador</button>
+                <button class="btn btn-primary" onclick="novoAdmin()">Novo Administrador de Condominio</button>
                 </div>
 
                 <input type="text" id="search_admin" class="search-bar" placeholder="Buscar por nome, telefone ou documento">
@@ -206,7 +289,7 @@
                                 <th>Nome</th>
                                 <th>Telefone</th>
                                 <th>Email</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="adminTable">
@@ -220,7 +303,7 @@
             <div id="clientes" class="page">
                 <div class="page-header">
                     <h2>Clientes</h2>
-                    <p>Gerencie os clientes (casas e condomínios)</p>
+                    <p>Gerencie os clientes (casas e condominios)</p>
                 </div>
 
                 <div class="menu">
@@ -236,7 +319,7 @@
                                 <th>Nome</th>
                                 <th>Tipo</th>
                                 <th>Telefone</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="clienteTable">
@@ -249,15 +332,15 @@
                 </div>
             </div>
 
- <!-- Síndicos -->
+ <!-- Sindicos -->
             <div id="sindico" class="page">
                 <div class="page-header">
-                    <h2>Síndicos</h2>
-                    <p>Gerencie os síndicos</p>
+                    <h2>Sindicos</h2>
+                    <p>Gerencie os sindicos</p>
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="novoSindico()">Novo Síndico</button>
+                <button class="btn btn-primary" onclick="novoSindico()">Novo Sindico</button>
                 </div>
 
                 <input type="text" id="search_sindico" class="search-bar" placeholder="Buscar por nome ou telefone">
@@ -268,7 +351,7 @@
                             <tr>
                                 <th>Nome</th>
                                 <th>Telefone</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="sindicoTable">
@@ -281,22 +364,22 @@
                 </div>
             </div>
 
- <!-- Serviços -->
+ <!-- Servicos -->
             <div id="servicos" class="page">
                 <div class="page-header">
-                    <h2>Serviços</h2>
-                    <p>Gerencie os serviços prestados</p>
+                    <h2>Servicos</h2>
+                    <p>Gerencie os servicos prestados</p>
                 </div>
 
                 <div class="menu">
-                <button class="btn btn-primary" onclick="novoServico()">Novo Serviço</button>
+                <button class="btn btn-primary" onclick="novoServico()">Novo Servico</button>
                 </div>
 
                 <input type="text" id="search_servico" class="search-bar" placeholder="Buscar por cliente">
 
                 <div class="filters">
                     <div class="form-group">
-                        <label for="servico_tipo_filter">Tipo de Serviço:</label>
+                        <label for="servico_tipo_filter">Tipo de Servico:</label>
                         <select id="servico_tipo_filter">
                             <option value="">Todos</option>
                             <?php if (!empty($tiposServico)): ?>
@@ -325,7 +408,7 @@
                         <label for="servico_filter_type">Filtrar por:</label>
                         <select id="servico_filter_type">
                             <option value="">Selecione</option>
-                            <option value="periodo">Período</option>
+                            <option value="periodo">Periodo</option>
                             <option value="ano">Ano</option>
                         </select>
                     </div>
@@ -344,7 +427,7 @@
                                 <th>Cliente</th>
                                 <th>Tipo</th>
                                 <th>Data</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="servicoTable">
@@ -357,11 +440,11 @@
                 </div>
             </div>
 
- <!-- Peças e Materiais -->
+ <!-- Pecas e Materiais -->
             <div id="pecas" class="page">
                 <div class="page-header">
-                    <h2>Peças e Materiais</h2>
-                    <p>Gerencie as compras de peças e materiais</p>
+                    <h2>Pecas e Materiais</h2>
+                    <p>Gerencie as compras de pecas e materiais</p>
                 </div>
 
                 <div class="menu">
@@ -375,7 +458,7 @@
                         <label for="compra_filter_type">Filtrar por:</label>
                         <select id="compra_filter_type">
                             <option value="">Selecione</option>
-                            <option value="periodo">Período</option>
+                            <option value="periodo">Periodo</option>
                             <option value="ano">Ano</option>
                         </select>
                     </div>
@@ -394,10 +477,10 @@
                                 <th>Data</th>
                                 <th>Material</th>
                                 <th>Quantidade</th>
-                                <th>Valor Unitário</th>
+                                <th>Valor Unitario</th>
                                 <th>Valor Total</th>
                                 <th>Distribuidora</th>
-                                <th>Ações</th>
+                                <th>Acoes</th>
                             </tr>
                         </thead>
                         <tbody id="compraTable">
@@ -510,11 +593,57 @@
     </div>
 
     <!-- Modais -->
+    <?php if ($isAdmin): ?>
+    <!-- Modal Funcionario -->
+    <div id="modalFuncionario" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="tituloModalFuncionario">Novo Funcionario</h3>
+            </div>
+            <form id="formFuncionario" action="<?= $baseUrl ?>/funcionarios/store" method="POST">
+                <input type="hidden" name="_token" value="<?= htmlspecialchars($funcionarioFormToken) ?>">
+                <input type="hidden" name="id" id="id_funcionario_modal">
+                <div class="form-group">
+                    <label for="nome_funcionario">Nome:</label>
+                    <input type="text" id="nome_funcionario" name="nome" required>
+                </div>
+                <div class="form-group">
+                    <label for="email_funcionario">Email:</label>
+                    <input type="email" id="email_funcionario" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="senha_funcionario">Senha:</label>
+                    <input type="password" id="senha_funcionario" name="senha" required>
+                    <small id="senha_funcionario_hint" class="form-help">Defina uma senha para acesso ao sistema.</small>
+                </div>
+                <div class="form-group">
+                    <label for="role_funcionario">Role do Funcionario (Sistema):</label>
+                    <select id="role_funcionario" name="id_role" required>
+                        <?php if (empty($rolesFuncionario)): ?>
+                            <option value="">Nenhum role cadastrado</option>
+                        <?php else: ?>
+                            <?php foreach ($rolesFuncionario as $role): ?>
+                                <option value="<?= (int)$role['id_role'] ?>">
+                                    <?= htmlspecialchars($role['role_nome']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modalFuncionario')">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="btnSalvarFuncionario">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
     <!-- Modal Administrador -->
     <div id="modalAdm" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="tituloModalAdm">Novo Administrador</h3>
+                <h3 id="tituloModalAdm">Novo Administrador de Condominio</h3>
             </div>
             <form id="formAdm" action="<?= $baseUrl ?>/admin/store" method="POST">
                 <input type="hidden" name="id" id="id_admin">
@@ -562,7 +691,7 @@
                     <label for="id_tipo_cliente">Tipo de Cliente:</label>
                     <select id="id_tipo_cliente" name="id_tipo_cliente" required onchange="toggleCondominioFields()">
                         <option value="1">Residencial</option>
-                        <option value="2">Condomínio</option>
+                        <option value="2">Condominio</option>
                     </select>
                 </div>
                 <div id="condominio-fields" style="display: none;">
@@ -572,7 +701,7 @@
                         <input type="file" id="cnpj_cliente" name="cnpj" accept=".pdf">
                     </div>
                     <div class="form-group">
-                        <label for="id_sindico">Síndico:</label>
+                        <label for="id_sindico">Sindico:</label>
                         <select id="id_sindico" name="id_sindico">
                             <option value="">Selecione</option>
                             <?php
@@ -582,7 +711,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="id_admin">Administrador:</label>
+                        <label for="id_admin">Administrador do Condominio:</label>
                         <select id="id_admin" name="id_admin">
                             <option value="">Selecione</option>
                             <?php $adminController->select(); ?>
@@ -594,7 +723,7 @@
                     <input type="text" id="rua_cliente" name="rua" required>
                 </div>
                 <div class="form-group">
-                    <label for="numero_cliente">Número:</label>
+                    <label for="numero_cliente">Numero:</label>
                     <input type="number" id="numero_cliente" name="numero" required>
                 </div>
                 <div class="form-group">
@@ -617,11 +746,11 @@
         </div>
     </div>
 
-    <!-- Modal Síndico -->
+    <!-- Modal Sindico -->
     <div id="modalSindico" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="tituloModalSindico">Novo Síndico</h3>
+                <h3 id="tituloModalSindico">Novo Sindico</h3>
             </div>
             <form id="formSindico" action="<?= $baseUrl ?>/sindico/store" method="POST">
                 <input type="hidden" name="id" id="id_sindico_hidden">
@@ -641,11 +770,11 @@
         </div>
     </div>
 
-    <!-- Modal Serviço -->
+    <!-- Modal Servico -->
     <div id="modalServico" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 id="tituloModalServico">Novo Serviço</h3>
+                <h3 id="tituloModalServico">Novo Servico</h3>
             </div>
             <form id="formServico" action="<?= $baseUrl ?>/servicos/store" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="id_servico">
@@ -661,11 +790,11 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="id_tipo_servico">Tipo de Serviço:</label>
+                    <label for="id_tipo_servico">Tipo de Servico:</label>
                     <select id="id_tipo_servico" name="id_tipo" required>
-                        <option value="1">Instalação</option>
-                        <option value="2">Manutenção Corretiva</option>
-                        <option value="3">Automação Preventiva</option>
+                        <option value="1">Instalacao</option>
+                        <option value="2">Manutencao Corretiva</option>
+                        <option value="3">Automacao Preventiva</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -698,15 +827,15 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="valor_servico">Valor do Serviço:</label>
+                    <label for="valor_servico">Valor do Servico:</label>
                     <input type="text" id="valor_servico" name="valor_servico" required>
                 </div>
                 <div class="form-group">
-                    <label for="descricao_servico">Descrição:</label>
+                    <label for="descricao_servico">Descricao:</label>
                     <textarea id="descricao_servico" name="descricao"></textarea>
                 </div>
                 <div class="form-group">
-                    <label for="observacao_servico">Observação:</label>
+                    <label for="observacao_servico">Observacao:</label>
                     <textarea id="observacao_servico" name="observacao"></textarea>
                 </div>
                 <div class="form-group">
@@ -750,7 +879,7 @@
                     <input type="number" id="qtd_compra" name="qtd_compra" required>
                 </div>
                 <div class="form-group">
-                    <label for="valor_un_compra">Valor Unitário:</label>
+                    <label for="valor_un_compra">Valor Unitario:</label>
                     <input type="number" step="0.01" id="valor_un_compra" name="valor_un" required>
                 </div>
                 <div class="form-group">
@@ -771,19 +900,8 @@
         </div>
     </div>
 
-    <script>
-        // Verificar se há parâmetro page na URL e navegar
-        const urlParams = new URLSearchParams(window.location.search);
-        const page = urlParams.get('page');
-        if (page) {
-            const menuItem = document.querySelector(`.menu-item[data-page="${page}"]`);
-            if (menuItem) {
-                showPage(page, menuItem);
-            }
-        }
-    </script>
-
 </body>
 </html>
+
 
 

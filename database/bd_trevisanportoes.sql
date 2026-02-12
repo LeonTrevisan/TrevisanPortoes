@@ -4,18 +4,38 @@ COLLATE utf8mb4_unicode_ci;
 
 USE bd_trevisanportoes;
 
+-- Roles dos funcionarios internos do sistema (nao confundir com tb_admin_cond).
+CREATE TABLE tb_role_funcionario (
+	id_role				INT				NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	role_nome			VARCHAR(50)		NOT NULL UNIQUE
+) CHARACTER SET UTF8MB4 COLLATE UTF8MB4_UNICODE_CI;
+
+-- Contas internas de acesso ao sistema.
+CREATE TABLE tb_funcionarios (
+	id_funcionario		INT				NOT NULL	AUTO_INCREMENT	PRIMARY KEY,
+	nome				VARCHAR(100)	NOT NULL,
+	email				VARCHAR(225)	NOT NULL UNIQUE,
+	senha				VARCHAR(255)	NOT NULL,
+	id_role				INT				NOT NULL,
+	deleted_at			DATETIME		NULL,
+	created_at			DATETIME		NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	updated_at			DATETIME		NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+	INDEX idx_funcionarios_id_role (id_role)
+)	CHARACTER SET UTF8MB4 COLLATE UTF8MB4_UNICODE_CI;
+
+-- Administradores de condominio vinculados aos clientes (tb_cliente.id_admin).
 CREATE TABLE tb_admin_cond (
-	id_admin 		SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_admin 			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	nome 				VARCHAR(40) NOT NULL,
-	telefone 		VARCHAR(11) NOT NULL,
-	email 			VARCHAR(50) NOT NULL,
+	telefone 			VARCHAR(11) NOT NULL,
+	email 				VARCHAR(50) NOT NULL,
 	INDEX idx_nome (nome)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE tb_sindico (
-	id_sindico 		SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id_sindico 			SMALLINT 	NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	nome 				VARCHAR(40) NOT NULL,
-	telefone 		VARCHAR(11) NOT NULL,
+	telefone 			VARCHAR(11) NOT NULL,
 	INDEX idx_nome (nome)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -101,6 +121,11 @@ CREATE TABLE tb_compras (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Foreign Keys
+ALTER TABLE tb_funcionarios
+	ADD CONSTRAINT fk_funcionario_role
+	FOREIGN KEY (id_role) REFERENCES tb_role_funcionario(id_role)
+	ON DELETE RESTRICT ON UPDATE CASCADE;
+
 ALTER TABLE tb_cliente
 	ADD CONSTRAINT fk_cliente_admin
 	FOREIGN KEY (id_admin) REFERENCES tb_admin_cond(id_admin)
@@ -161,6 +186,18 @@ INSERT INTO tb_status_pagamento (status_pagamento) VALUES
 ('Pendente'),
 ('Pago'),
 ('Cancelado');
+
+INSERT INTO tb_role_funcionario (role_nome) VALUES
+('Administradores'),
+('Funcionarios');
+
+INSERT INTO tb_funcionarios (nome, email, senha, id_role) VALUES
+(
+	'Administrador Master',
+	'admin@gmail.com',
+	'$2y$12$R3S48Xes/ka9.8lPdh/UYuC/leA5T4fMLAVsh.Jqd/8/xFRWviRC6',
+	(SELECT id_role FROM tb_role_funcionario WHERE role_nome = 'Administradores' LIMIT 1)
+);
 
 INSERT INTO tb_admin_cond (nome, telefone, email) VALUES
 ('Carlos Silva', '11999990001', 'carlos@condominio.com'),

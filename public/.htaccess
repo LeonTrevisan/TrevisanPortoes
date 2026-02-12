@@ -3,8 +3,8 @@ RewriteEngine On
 # Redirecionar rotas da API para router.php
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_URI} (clientes|admin|sindico|servicos|compras|softDelete)
-RewriteRule ^(clientes|admin|sindico|servicos|compras|softDelete)(/.*)?$ router.php?path=$1$2 [QSA,L]
+RewriteCond %{REQUEST_URI} (clientes|admin|sindico|servicos|compras|softDelete|auth|funcionarios)
+RewriteRule ^(clientes|admin|sindico|servicos|compras|softDelete|auth|funcionarios)(/.*)?$ router.php?path=$1$2 [QSA,L]
 
 # Redirecionar o resto para index.php
 RewriteCond %{REQUEST_FILENAME} !-f

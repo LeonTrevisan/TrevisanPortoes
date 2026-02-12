@@ -39,9 +39,10 @@
 
     <?php if ($cliente['id_admin']): ?>
     <div class="admin-info">
-        <h3>Informações do Administrador</h3>
-        <p><strong>Nome:</strong> <?= htmlspecialchars($cliente['admin_nome']) ?></p>
-        <!-- Adicionar mais info do admin se necessário -->
+        <h3>Informações do Administrador do Condomínio</h3>
+        <p><strong>Nome:</strong> <?= htmlspecialchars($cliente['admin_cond_nome'] ?? $cliente['admin_nome'] ?? 'N/A') ?></p>
+        <p><strong>Email:</strong> <?= htmlspecialchars($cliente['admin_cond_email'] ?? 'N/A') ?></p>
+        <p><strong>Telefone:</strong> <?= !empty($cliente['admin_cond_telefone']) ? htmlspecialchars(formatarTelefone($cliente['admin_cond_telefone'])) : 'N/A' ?></p>
     </div>
     <?php endif; ?>
 

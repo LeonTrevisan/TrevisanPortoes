@@ -52,7 +52,12 @@ class ClienteRepository
     public function findById(int $id): ?array
     {
         $stmt = $this->db->prepare("
-            SELECT c.*, tc.tipo_cliente, a.nome as admin_nome, s.nome as sindico_nome,
+            SELECT c.*, tc.tipo_cliente,
+                   a.nome as admin_nome,
+                   a.nome as admin_cond_nome,
+                   a.email as admin_cond_email,
+                   a.telefone as admin_cond_telefone,
+                   s.nome as sindico_nome,
                    e.rua, e.bairro, e.numero, e.cidade, e.complemento
             FROM tb_cliente c
             LEFT JOIN tb_tipo_cliente tc ON c.id_tipo_cliente = tc.id_tipo_cliente
@@ -69,7 +74,12 @@ class ClienteRepository
     public function getAll(): array
     {
         $stmt = $this->db->query("
-            SELECT c.*, tc.tipo_cliente, a.nome as admin_nome, s.nome as sindico_nome,
+            SELECT c.*, tc.tipo_cliente,
+                   a.nome as admin_nome,
+                   a.nome as admin_cond_nome,
+                   a.email as admin_cond_email,
+                   a.telefone as admin_cond_telefone,
+                   s.nome as sindico_nome,
                    e.rua, e.bairro, e.numero, e.cidade, e.complemento
             FROM tb_cliente c
             LEFT JOIN tb_tipo_cliente tc ON c.id_tipo_cliente = tc.id_tipo_cliente
@@ -84,7 +94,12 @@ class ClienteRepository
     public function getAtivos(): array
     {
         $stmt = $this->db->query("
-            SELECT c.*, tc.tipo_cliente, a.nome as admin_nome, s.nome as sindico_nome,
+            SELECT c.*, tc.tipo_cliente,
+                   a.nome as admin_nome,
+                   a.nome as admin_cond_nome,
+                   a.email as admin_cond_email,
+                   a.telefone as admin_cond_telefone,
+                   s.nome as sindico_nome,
                    e.rua, e.bairro, e.numero, e.cidade, e.complemento
             FROM tb_cliente c
             LEFT JOIN tb_tipo_cliente tc ON c.id_tipo_cliente = tc.id_tipo_cliente

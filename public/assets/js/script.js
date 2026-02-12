@@ -1,13 +1,29 @@
 // Funções de navegação
-function showPage(pageId, element) {
+function activatePage(pageId, element) {
     const pages = document.querySelectorAll('.page');
     const menuItems = document.querySelectorAll('.menu-item');
 
     pages.forEach(page => page.classList.remove('active'));
     menuItems.forEach(item => item.classList.remove('active'));
 
-    document.getElementById(pageId).classList.add('active');
-    element.classList.add('active');
+    const page = document.getElementById(pageId);
+    if (page) {
+        page.classList.add('active');
+    }
+
+    if (element) {
+        element.classList.add('active');
+        return;
+    }
+
+    const autoMenuItem = document.querySelector('.menu-item[data-page="' + pageId + '"]');
+    if (autoMenuItem) {
+        autoMenuItem.classList.add('active');
+    }
+}
+
+function showPage(pageId, element) {
+    activatePage(pageId, element);
 
     // Carregar conteúdo da página se necessário
     loadPageContent(pageId);
@@ -667,6 +683,44 @@ function novoServico() {
     openModal('modalServico');
 }
 
+function novoFuncionario() {
+    const form = document.getElementById('formFuncionario');
+    if (!form) {
+        return;
+    }
+
+    form.reset();
+
+    const idInput = document.getElementById('id_funcionario_modal');
+    if (idInput) {
+        idInput.value = '';
+    }
+
+    const senhaInput = document.getElementById('senha_funcionario');
+    if (senhaInput) {
+        senhaInput.required = true;
+        senhaInput.value = '';
+    }
+
+    const hint = document.getElementById('senha_funcionario_hint');
+    if (hint) {
+        hint.textContent = 'Defina uma senha para acesso ao sistema.';
+    }
+
+    const titulo = document.getElementById('tituloModalFuncionario');
+    if (titulo) {
+        titulo.textContent = 'Novo Funcionario';
+    }
+
+    const btnSalvar = document.getElementById('btnSalvarFuncionario');
+    if (btnSalvar) {
+        btnSalvar.textContent = 'Salvar';
+    }
+
+    form.action = baseUrl + '/funcionarios/store';
+    openModal('modalFuncionario');
+}
+
 function novoAdmin() {
     const formAdm = document.getElementById('formAdm');
     if (!formAdm) {
@@ -680,7 +734,7 @@ function novoAdmin() {
     }
     const titulo = document.getElementById('tituloModalAdm');
     if (titulo) {
-        titulo.textContent = 'Novo Administrador';
+        titulo.textContent = 'Novo Administrador de Condominio';
     }
     const btnSalvar = document.getElementById('btnSalvarAdm');
     if (btnSalvar) {
@@ -822,6 +876,66 @@ function toggleFormaPagamento() {
 }
 
 // Funções de edição
+function editarFuncionario(id) {
+    fetch(baseUrl + '/funcionarios/obter?id=' + encodeURIComponent(id))
+        .then(r => r.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                return;
+            }
+
+            const form = document.getElementById('formFuncionario');
+            if (!form) {
+                return;
+            }
+
+            const idInput = document.getElementById('id_funcionario_modal');
+            if (idInput) {
+                idInput.value = data.id_funcionario || '';
+            }
+
+            const nomeInput = document.getElementById('nome_funcionario');
+            if (nomeInput) {
+                nomeInput.value = data.nome || '';
+            }
+
+            const emailInput = document.getElementById('email_funcionario');
+            if (emailInput) {
+                emailInput.value = data.email || '';
+            }
+
+            const roleSelect = document.getElementById('role_funcionario');
+            if (roleSelect) {
+                roleSelect.value = data.id_role ? String(data.id_role) : roleSelect.value;
+            }
+
+            const senhaInput = document.getElementById('senha_funcionario');
+            if (senhaInput) {
+                senhaInput.required = false;
+                senhaInput.value = '';
+            }
+
+            const hint = document.getElementById('senha_funcionario_hint');
+            if (hint) {
+                hint.textContent = 'Deixe em branco para manter a senha atual.';
+            }
+
+            const titulo = document.getElementById('tituloModalFuncionario');
+            if (titulo) {
+                titulo.textContent = 'Editar Funcionario';
+            }
+
+            const btnSalvar = document.getElementById('btnSalvarFuncionario');
+            if (btnSalvar) {
+                btnSalvar.textContent = 'Atualizar';
+            }
+
+            form.action = baseUrl + '/funcionarios/update';
+            openModal('modalFuncionario');
+        });
+}
+
 function editarAdmin(id) {
     fetch(baseUrl + '/admin/obter?id=' + id)
         .then(r => r.json())
@@ -830,7 +944,7 @@ function editarAdmin(id) {
             document.getElementById('nome_admin').value = data.nome;
             document.getElementById('telefone_admin').value = data.telefone;
             document.getElementById('email_admin').value = data.email;
-            document.getElementById('tituloModalAdm').textContent = 'Editar Administrador';
+            document.getElementById('tituloModalAdm').textContent = 'Editar Administrador de Condominio';
             document.getElementById('btnSalvarAdm').textContent = 'Atualizar';
             document.getElementById('formAdm').action = baseUrl + '/admin/update';
             openModal('modalAdm');
@@ -1081,6 +1195,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupClienteSelectSearch();
     setupFichaPage();
     setupSearchInput('search_admin', 'adminTable', [0, 1]);
+    setupSearchInput('search_funcionario', 'funcionarioTable', [0, 1]);
     setupSearchInput('search_cliente', 'clienteTable', [0, 2]);
     setupSearchInput('search_sindico', 'sindicoTable', [0, 1]);
     setupCompraFilters();
@@ -1202,9 +1317,11 @@ window.addEventListener('DOMContentLoaded', function() {
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page');
     if (page) {
-        const element = document.querySelector(`.menu-item[onclick*="showPage('${page}'"]`);
+        const element = document.querySelector(`.menu-item[data-page="${page}"]`);
         if (element) {
             showPage(page, element);
+        } else {
+            activatePage(page);
         }
     }
     const status = urlParams.get('status');

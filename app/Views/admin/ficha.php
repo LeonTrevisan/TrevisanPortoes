@@ -1,9 +1,9 @@
 <div class="ficha-admin ficha-completa">
     <button class="btn-close" data-page="admin" onclick="voltarParaDashboard(this)">×</button>
-    <h2>Ficha Completa do Administrador</h2>
+    <h2>Ficha Completa do Administrador de Condominio</h2>
     <div class="admin-info ficha-info">
         <p>
-            <h3>Informações do Administrador</h3>
+            <h3>Informacoes do Administrador de Condominio</h3>
         </p>
         <p><strong>Nome:</strong> <?= htmlspecialchars($admin['nome']) ?></p>
         <p><strong>Telefone:</strong> <?= formatarTelefone($admin['telefone']) ?></p>
